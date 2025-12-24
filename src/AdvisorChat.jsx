@@ -60,7 +60,7 @@ export default function AdvisorChat({
       const greeting = {
         id: Date.now(),
         role: 'advisor',
-        content: `Hi${userName ? ` ${userName}` : ''}! I'm here to help you navigate your day-to-day financial questions.\n\nFor meaningful changes to your overall approach, [schedule time with your AI Advisor].`,
+        content: `Hi${userName ? ` ${userName}` : ''}! I am here to help you navigate your day-to-day financial questions.\n\nFor meaningful changes to your overall approach, [schedule time with your AI Advisor].`,
         timestamp: new Date(),
         hasLink: true  // Flag to render the link
       };
@@ -616,22 +616,34 @@ function getFallbackResponse(userMessage, userProfile) {
   const lower = userMessage.toLowerCase();
   
   if (lower.includes('debt') || lower.includes('owe')) {
-    return `I hear that debt is on your mind${userProfile?.debtStress === 'Yes, significantly' ? ' — and you mentioned it's been causing real stress' : ''}. Here's what helps: focus on one card at a time, usually the highest interest rate first. Even $25 extra per month makes a difference. What's the one debt that bothers you most?`;
+    const stressNote = userProfile?.debtStress === 'Yes, significantly' 
+      ? ' — and you mentioned it has been causing real stress' 
+      : '';
+    return `I hear that debt is on your mind${stressNote}. Here is what helps: focus on one card at a time, usually the highest interest rate first. Even $25 extra per month makes a difference. What is the one debt that bothers you most?`;
   }
   
   if (lower.includes('first') || lower.includes('focus') || lower.includes('start')) {
-    return `Good question. ${userProfile?.hasDebt && userProfile?.debtStress ? 'Given your debt is causing stress, I\'d start there — but build a tiny $500 buffer first so surprises don\'t create new debt.' : 'The foundation: small emergency buffer → high-interest debt → expand buffer → then investing.'} What feels most urgent right now?`;
+    const advice = userProfile?.hasDebt && userProfile?.debtStress 
+      ? 'Given your debt is causing stress, I would start there — but build a tiny $500 buffer first so surprises do not create new debt.' 
+      : 'The foundation: small emergency buffer → high-interest debt → expand buffer → then investing.';
+    return `Good question. ${advice} What feels most urgent right now?`;
   }
   
   if (lower.includes('purchase') || lower.includes('buy') || lower.includes('worth it')) {
-    return `When thinking through a purchase: "Will I still be glad I bought this in 2 weeks?" If yes, does it fit the budget without stress? ${userProfile?.goals?.includes('breathing') ? 'You mentioned wanting breathing room — does this support that, or work against it?' : 'What\'s your gut telling you?'}`;
+    const goalNote = userProfile?.goals?.includes('breathing') 
+      ? 'You mentioned wanting breathing room — does this support that, or work against it?' 
+      : 'What is your gut telling you?';
+    return `When thinking through a purchase: "Will I still be glad I bought this in 2 weeks?" If yes, does it fit the budget without stress? ${goalNote}`;
   }
   
   if (lower.includes('month') || lower.includes('doing')) {
-    return `Without your actual numbers connected, here's what matters: Are you ending each month with something left over, even $50? That's the foundation. ${userProfile?.incomeStability === 'Uncertain' ? 'With uncertain income, even a small buffer matters more than optimizing.' : ''} How does a typical month look?`;
+    const incomeNote = userProfile?.incomeStability === 'Uncertain' 
+      ? 'With uncertain income, even a small buffer matters more than optimizing.' 
+      : '';
+    return `Without your actual numbers connected, here is what matters: Are you ending each month with something left over, even $50? That is the foundation. ${incomeNote} How does a typical month look?`;
   }
   
-  return `I want to make sure I'm helpful here. Could you tell me more about what's prompting this question? The more specific, the more relevant I can be to your actual situation.`;
+  return `I want to make sure I am helpful here. Could you tell me more about what is prompting this question? The more specific, the more relevant I can be to your actual situation.`;
 }
 
 function getFallbackSynthesis(messages, userProfile) {
@@ -652,7 +664,7 @@ Taking time to think through decisions — instead of just reacting — puts you
 This week: Write down the one financial thing on your mind most. Getting it out of your head is the first step.
 
 **Remember:**
-You're asking the right questions. That's progress.`
+You are asking the right questions. That is progress.`
   };
 }
 
