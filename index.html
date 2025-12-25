@@ -3,37 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#6366f1" />
-    <meta name="description" content="OpenSpace - Your fiduciary guardian for financial wellbeing" />
+    <meta name="theme-color" content="#818cf8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    
     <title>OpenSpace</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.imgur.com/oWuVYXz.png" />
+    <link rel="apple-touch-icon" href="https://i.imgur.com/oWuVYXz.png" />
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
       }
-      body {
-        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      
+      html, body, #root {
+        height: 100%;
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background: #f8fafc;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
+      
       /* Hide scrollbar but allow scrolling */
-      ::-webkit-scrollbar {
-        width: 0;
-        background: transparent;
+      body {
+        overflow-y: scroll;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
+      body::-webkit-scrollbar {
+        display: none;
+      }
+      
       /* Animations */
       @keyframes pulse {
         0%, 100% { opacity: 0.4; }
         50% { opacity: 1; }
       }
+      
       @keyframes spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
       }
     </style>
   </head>
