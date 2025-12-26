@@ -210,7 +210,7 @@ function HomeTab({ userName, isOnboarded, linkedAccounts, onStartOnboarding, onO
             </div>
             <span style={styles.cardLabel}>Next check-in with</span>
           </div>
-          <button style={styles.menuBtn}><MoreIcon /></button>
+          <button style={styles.menuBtn}><MoreVertIcon /></button>
         </div>
 
         <div style={styles.advisorRow}>
