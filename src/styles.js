@@ -1,29 +1,96 @@
-// OpenSpace App - Complete Styles
-const styles = {
-  // ===========================================
-  // CONTAINER & LAYOUT
-  // ===========================================
+// ============================================
+// OPENSPACE DESIGN SYSTEM — KUMO EDITION
+// ============================================
+
+// Kumo cloud image URL
+export const KUMO_URL = 'https://i.imgur.com/oWuVYXz.png';
+
+// ============================================
+// COLOR PALETTE — INDIGO SKY
+// ============================================
+export const colors = {
+  // Primary gradient colors
+  indigo: '#818cf8',
+  indigoDeep: '#6366f1',
+  sky: '#38bdf8',
+  skyDeep: '#0ea5e9',
+  
+  // Neutrals
+  text: '#1e293b',
+  textSecondary: '#64748b',
+  textMuted: '#94a3b8',
+  border: '#e2e8f0',
+  bgLight: '#f1f5f9',
+  bgPage: '#f8fafc',
+  white: '#ffffff',
+  
+  // Semantic
+  success: '#10b981',
+  successLight: '#ecfdf5',
+  warning: '#f59e0b',
+  warningLight: '#fffbeb',
+  error: '#ef4444',
+  errorLight: '#fef2f2',
+};
+
+// ============================================
+// GRADIENTS
+// ============================================
+export const gradients = {
+  primary: 'linear-gradient(135deg, #818cf8 0%, #38bdf8 100%)',
+  primaryHover: 'linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%)',
+  background: 'linear-gradient(135deg, #e0e7ff 0%, #e0f2fe 50%, #f0f9ff 100%)',
+  subtle: 'linear-gradient(180deg, #f0f9ff 0%, #f8fafc 100%)',
+  card: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)',
+};
+
+// ============================================
+// SHADOWS
+// ============================================
+export const shadows = {
+  sm: '0 1px 2px rgba(0, 0, 0, 0.05)',
+  base: '0 2px 8px rgba(0, 0, 0, 0.06)',
+  md: '0 4px 12px rgba(0, 0, 0, 0.08)',
+  lg: '0 8px 24px rgba(0, 0, 0, 0.1)',
+  primary: '0 4px 16px rgba(99, 102, 241, 0.25)',
+  card: '0 4px 20px rgba(0, 0, 0, 0.06)',
+};
+
+// ============================================
+// COMPONENT STYLES
+// ============================================
+export const styles = {
+  // ==========================================
+  // LAYOUT
+  // ==========================================
   container: {
     minHeight: '100vh',
-    background: '#f8fafc',
+    background: colors.bgPage,
     position: 'relative',
     maxWidth: 430,
     margin: '0 auto',
     fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
   },
+
   backgroundGradient: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 300,
-    background: 'linear-gradient(135deg, #e0e7ff 0%, #fae8ff 50%, #fce7f3 100%)',
+    height: 280,
+    background: gradients.background,
     zIndex: 0,
   },
 
-  // ===========================================
+  main: {
+    padding: '0 20px 120px',
+    position: 'relative',
+    zIndex: 1,
+  },
+
+  // ==========================================
   // HEADER
-  // ===========================================
+  // ==========================================
   header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -32,402 +99,404 @@ const styles = {
     position: 'relative',
     zIndex: 1,
   },
+
   logoContainer: {
     display: 'flex',
     alignItems: 'center',
     gap: 10,
   },
+
   logoIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    background: gradients.primary,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'white',
+    padding: 8,
+    boxShadow: shadows.primary,
   },
+
+  logoImage: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    filter: 'brightness(0) invert(1)',
+  },
+
   logoText: {
     fontSize: 22,
     fontWeight: 700,
-    color: '#1e293b',
-    letterSpacing: '-0.5px',
+    color: colors.text,
+    letterSpacing: -0.5,
   },
+
   headerRight: {
     display: 'flex',
     alignItems: 'center',
     gap: 12,
   },
+
   notificationBtn: {
-    position: 'relative',
-    background: 'white',
-    border: 'none',
-    borderRadius: 12,
     width: 44,
     height: 44,
+    borderRadius: 12,
+    background: 'rgba(255, 255, 255, 0.8)',
+    border: 'none',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+    position: 'relative',
   },
+
   notificationDot: {
     position: 'absolute',
     top: 10,
     right: 10,
     width: 8,
     height: 8,
-    background: '#ef4444',
     borderRadius: '50%',
-    border: '2px solid white',
+    background: colors.error,
   },
+
   avatar: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+    background: gradients.primary,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'white',
+    color: colors.white,
     fontWeight: 600,
     fontSize: 16,
+    boxShadow: shadows.primary,
   },
 
-  // ===========================================
-  // NAVIGATION
-  // ===========================================
+  // ==========================================
+  // NAV PILLS
+  // ==========================================
   navPills: {
     display: 'flex',
     gap: 8,
-    padding: '0 20px 16px',
+    padding: '0 20px 20px',
     position: 'relative',
     zIndex: 1,
     overflowX: 'auto',
   },
+
   navPill: {
     display: 'flex',
     alignItems: 'center',
     gap: 6,
     padding: '10px 16px',
-    background: 'rgba(255,255,255,0.7)',
+    background: 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'blur(8px)',
     border: 'none',
-    borderRadius: 20,
+    borderRadius: 24,
     fontSize: 14,
     fontWeight: 500,
-    color: '#64748b',
+    color: colors.textSecondary,
     cursor: 'pointer',
     whiteSpace: 'nowrap',
-    transition: 'all 0.2s',
+    transition: 'all 0.2s ease',
   },
+
   navPillActive: {
-    background: 'white',
-    color: '#1e293b',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    background: colors.white,
+    color: colors.text,
+    boxShadow: shadows.base,
   },
 
-  // ===========================================
-  // MAIN CONTENT
-  // ===========================================
-  main: {
-    padding: '0 20px 100px',
-    position: 'relative',
-    zIndex: 1,
-  },
-  greeting: {
-    marginBottom: 16,
-  },
-  greetingText: {
-    fontSize: 20,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  pageTitle: {
-    fontSize: 26,
-    fontWeight: 700,
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  pageSubtitle: {
-    fontSize: 15,
-    color: '#64748b',
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-
-  // ===========================================
+  // ==========================================
   // CARDS
-  // ===========================================
+  // ==========================================
   card: {
-    background: 'white',
+    background: colors.white,
     borderRadius: 20,
     padding: 24,
     marginBottom: 16,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+    boxShadow: shadows.card,
   },
+
   cardHeader: {
     display: 'flex',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'space-between',
     marginBottom: 16,
   },
-  checkInIcon: {
-    width: 32,
-    height: 32,
+
+  cardHeaderLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+
+  cardIcon: {
+    width: 36,
+    height: 36,
     borderRadius: 10,
-    background: '#ecfdf5',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkInLabel: {
-    flex: 1,
+
+  cardIconSuccess: {
+    background: colors.successLight,
+  },
+
+  cardIconPrimary: {
+    background: '#eef2ff',
+  },
+
+  cardTitle: {
     fontSize: 14,
-    color: '#64748b',
+    fontWeight: 500,
+    color: colors.textSecondary,
   },
-  moreBtn: {
-    background: 'none',
+
+  cardMenu: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    background: 'transparent',
     border: 'none',
-    color: '#94a3b8',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     cursor: 'pointer',
-    fontSize: 16,
-    letterSpacing: 2,
   },
+
+  // ==========================================
+  // ADVISOR CARD
+  // ==========================================
   advisorRow: {
     display: 'flex',
     alignItems: 'center',
     gap: 14,
-    marginBottom: 12,
+    marginBottom: 16,
   },
+
   advisorAvatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    background: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)',
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    background: gradients.card,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  advisorInfo: {
+    flex: 1,
+  },
+
   advisorName: {
     fontSize: 17,
     fontWeight: 600,
-    color: '#1e293b',
+    color: colors.text,
+    marginBottom: 2,
   },
+
   advisorSubtext: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textSecondary,
   },
+
   dateRow: {
     display: 'flex',
     alignItems: 'baseline',
-    gap: 10,
-    marginBottom: 16,
+    gap: 8,
+    marginBottom: 12,
   },
+
   dateHighlight: {
     fontSize: 18,
     fontWeight: 600,
-    color: '#6366f1',
+    color: colors.indigo,
   },
+
   timeText: {
-    fontSize: 15,
-    color: '#64748b',
+    fontSize: 14,
+    color: colors.textSecondary,
   },
+
   recommendText: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textSecondary,
     marginBottom: 20,
     lineHeight: 1.5,
   },
 
-  // ===========================================
+  // ==========================================
   // BUTTONS
-  // ===========================================
-  secondaryBtn: {
+  // ==========================================
+  buttonPrimary: {
     width: '100%',
     padding: '14px 20px',
-    background: 'transparent',
+    background: gradients.primary,
     border: 'none',
-    borderRadius: 12,
+    borderRadius: 14,
     fontSize: 15,
     fontWeight: 600,
-    color: '#1e293b',
-    cursor: 'pointer',
-    marginBottom: 10,
-  },
-  primaryBtn: {
-    width: '100%',
-    padding: '14px 20px',
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    border: 'none',
-    borderRadius: 12,
-    fontSize: 15,
-    fontWeight: 600,
-    color: 'white',
+    color: colors.white,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    boxShadow: shadows.primary,
+    transition: 'transform 0.2s, box-shadow 0.2s',
   },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    background: 'rgba(255,255,255,0.8)',
+
+  buttonSecondary: {
+    width: '100%',
+    padding: '14px 20px',
+    background: 'transparent',
     border: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 14,
+    fontSize: 15,
+    fontWeight: 600,
+    color: colors.text,
+    cursor: 'pointer',
+    marginBottom: 8,
+  },
+
+  buttonOutline: {
+    width: '100%',
+    padding: '14px 20px',
+    background: colors.white,
+    border: `2px solid ${colors.border}`,
+    borderRadius: 14,
+    fontSize: 15,
+    fontWeight: 600,
+    color: colors.text,
     cursor: 'pointer',
   },
 
-  // ===========================================
+  // ==========================================
   // SNAPSHOT CARD
-  // ===========================================
-  snapshotCard: {
-    background: 'white',
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 16,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-  },
-  snapshotHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 20,
-  },
-  snapshotTitle: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
+  // ==========================================
   snapshotGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: 16,
-    marginBottom: 16,
+    gap: 20,
+    marginTop: 16,
   },
+
   snapshotItem: {
     display: 'flex',
     flexDirection: 'column',
     gap: 4,
   },
+
   snapshotLabel: {
     fontSize: 13,
-    color: '#64748b',
-  },
-  snapshotValue: {
-    fontSize: 20,
-    fontWeight: 600,
-    color: '#cbd5e1',
-  },
-  snapshotHint: {
-    fontSize: 13,
-    color: '#94a3b8',
-    textAlign: 'center',
-    fontStyle: 'italic',
+    color: colors.textSecondary,
+    fontWeight: 500,
   },
 
-  // ===========================================
+  snapshotValue: {
+    fontSize: 22,
+    fontWeight: 700,
+    color: colors.text,
+  },
+
+  snapshotValueEmpty: {
+    fontSize: 22,
+    fontWeight: 700,
+    color: colors.border,
+  },
+
+  snapshotHint: {
+    gridColumn: '1 / -1',
+    fontSize: 13,
+    color: colors.textMuted,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+
+  // ==========================================
   // TASKS
-  // ===========================================
-  tasksSection: {
-    background: 'white',
-    borderRadius: 20,
-    padding: 20,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-  },
-  tasksHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-    paddingBottom: 16,
-    borderBottom: '1px solid #f1f5f9',
-  },
-  tasksTitle: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  tasksList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 4,
-  },
+  // ==========================================
   taskItem: {
     display: 'flex',
     alignItems: 'center',
     gap: 14,
-    padding: '14px 0',
+    padding: '16px 0',
     background: 'none',
     border: 'none',
-    borderBottom: '1px solid #f1f5f9',
+    borderBottom: `1px solid ${colors.bgLight}`,
     cursor: 'pointer',
     textAlign: 'left',
     width: '100%',
   },
+
+  taskItemLast: {
+    borderBottom: 'none',
+  },
+
   taskCheck: {
     width: 24,
     height: 24,
-  },
-  taskCheckEmpty: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    border: '2px solid #e2e8f0',
-  },
-  taskCheckComplete: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    background: '#10b981',
-    color: 'white',
+    borderRadius: 8,
+    border: `2px solid ${colors.border}`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 12,
-    fontWeight: 700,
+    flexShrink: 0,
   },
+
+  taskCheckComplete: {
+    background: colors.success,
+    borderColor: colors.success,
+  },
+
   taskInfo: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     gap: 2,
   },
+
   taskName: {
     fontSize: 15,
     fontWeight: 500,
-    color: '#1e293b',
+    color: colors.text,
   },
+
   taskNameComplete: {
     textDecoration: 'line-through',
-    color: '#94a3b8',
+    color: colors.textMuted,
   },
-  taskUrgent: {
+
+  taskStatus: {
     fontSize: 13,
-    color: '#f59e0b',
-    fontWeight: 500,
-  },
-  taskPending: {
-    fontSize: 13,
-    color: '#94a3b8',
-  },
-  taskComplete: {
-    fontSize: 13,
-    color: '#10b981',
     fontWeight: 500,
   },
 
-  // ===========================================
-  // BOTTOM NAVIGATION
-  // ===========================================
+  taskStatusUrgent: {
+    color: colors.warning,
+  },
+
+  taskStatusPending: {
+    color: colors.textMuted,
+  },
+
+  taskStatusComplete: {
+    color: colors.success,
+  },
+
+  taskArrow: {
+    color: colors.textMuted,
+  },
+
+  // ==========================================
+  // BOTTOM NAV
+  // ==========================================
   bottomNav: {
     position: 'fixed',
     bottom: 0,
@@ -435,13 +504,14 @@ const styles = {
     transform: 'translateX(-50%)',
     width: '100%',
     maxWidth: 430,
-    background: 'white',
+    background: colors.white,
     display: 'flex',
     justifyContent: 'space-around',
-    padding: '12px 20px 24px',
-    borderTop: '1px solid #f1f5f9',
+    padding: '12px 20px 28px',
+    borderTop: `1px solid ${colors.bgLight}`,
     zIndex: 100,
   },
+
   bottomNavItem: {
     display: 'flex',
     flexDirection: 'column',
@@ -451,54 +521,42 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
     position: 'relative',
+    padding: '4px 12px',
   },
+
   bottomNavLabel: {
     fontSize: 12,
-    color: '#94a3b8',
     fontWeight: 500,
+    color: colors.textMuted,
   },
-  messageBadge: {
+
+  bottomNavLabelActive: {
+    color: colors.indigo,
+  },
+
+  bottomNavBadge: {
     position: 'absolute',
-    top: -2,
+    top: 0,
     right: 4,
-    width: 18,
+    minWidth: 18,
     height: 18,
-    background: '#ef4444',
-    borderRadius: '50%',
-    color: 'white',
+    background: colors.error,
+    borderRadius: 9,
+    color: colors.white,
     fontSize: 11,
     fontWeight: 600,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: '0 4px',
   },
 
-  // ===========================================
-  // FLOATING HELP
-  // ===========================================
-  floatingHelp: {
-    position: 'fixed',
-    bottom: 100,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    border: 'none',
-    boxShadow: '0 4px 20px rgba(99, 102, 241, 0.4)',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 99,
-  },
-
-  // ===========================================
-  // ONBOARDING CONTAINER
-  // ===========================================
+  // ==========================================
+  // ONBOARDING
+  // ==========================================
   onboardingContainer: {
     minHeight: '100vh',
-    background: '#f8fafc',
+    background: colors.bgPage,
     position: 'relative',
     maxWidth: 430,
     margin: '0 auto',
@@ -506,15 +564,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
-  onboardingGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 200,
-    background: 'linear-gradient(135deg, #e0e7ff 0%, #fae8ff 50%, #fce7f3 100%)',
-    zIndex: 0,
-  },
+
   onboardingHeader: {
     display: 'flex',
     alignItems: 'center',
@@ -523,31 +573,48 @@ const styles = {
     zIndex: 1,
     gap: 16,
   },
+
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    background: 'rgba(255, 255, 255, 0.8)',
+    border: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+  },
+
   progressContainer: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
+
   progressBar: {
     width: '100%',
     height: 6,
-    background: 'rgba(255,255,255,0.5)',
+    background: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 3,
     overflow: 'hidden',
   },
+
   progressFill: {
     height: '100%',
-    background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)',
+    background: gradients.primary,
     borderRadius: 3,
     transition: 'width 0.3s ease',
   },
+
   progressText: {
-    fontSize: 12,
-    color: '#64748b',
+    fontSize: 13,
+    color: colors.textSecondary,
     fontWeight: 500,
   },
+
   onboardingMain: {
     flex: 1,
     padding: '0 20px',
@@ -556,6 +623,7 @@ const styles = {
     overflowY: 'auto',
     paddingBottom: 120,
   },
+
   onboardingFooter: {
     position: 'fixed',
     bottom: 0,
@@ -564,98 +632,159 @@ const styles = {
     width: '100%',
     maxWidth: 430,
     padding: '20px',
-    background: 'linear-gradient(180deg, transparent 0%, #f8fafc 20%)',
+    background: `linear-gradient(180deg, transparent 0%, ${colors.bgPage} 30%)`,
     zIndex: 10,
   },
+
   continueBtn: {
     width: '100%',
     padding: '16px 24px',
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+    background: gradients.primary,
     border: 'none',
-    borderRadius: 14,
+    borderRadius: 16,
     fontSize: 16,
     fontWeight: 600,
-    color: 'white',
+    color: colors.white,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+    boxShadow: shadows.primary,
   },
 
-  // ===========================================
-  // STEP CONTENT
-  // ===========================================
+  // ==========================================
+  // FORM ELEMENTS
+  // ==========================================
   stepContent: {
     paddingTop: 20,
   },
+
   stepTitle: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 700,
-    color: '#1e293b',
+    color: colors.text,
     marginBottom: 8,
-    letterSpacing: '-0.5px',
+    letterSpacing: -0.5,
   },
+
   stepSubtitle: {
     fontSize: 16,
-    color: '#64748b',
+    color: colors.textSecondary,
     marginBottom: 32,
     lineHeight: 1.5,
   },
 
-  // ===========================================
-  // FORM ELEMENTS
-  // ===========================================
   formGroup: {
     marginBottom: 28,
   },
+
   label: {
     display: 'block',
     fontSize: 15,
     fontWeight: 600,
-    color: '#1e293b',
+    color: colors.text,
     marginBottom: 12,
   },
-  labelHint: {
-    fontSize: 13,
-    color: '#94a3b8',
-    marginTop: -8,
-    marginBottom: 12,
-  },
+
   input: {
     width: '100%',
     padding: '16px 18px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
+    background: colors.white,
+    border: `2px solid ${colors.border}`,
     borderRadius: 14,
     fontSize: 16,
-    color: '#1e293b',
+    color: colors.text,
     outline: 'none',
+    boxSizing: 'border-box',
     transition: 'border-color 0.2s',
-    boxSizing: 'border-box',
   },
-  textarea: {
-    width: '100%',
+
+  inputFocus: {
+    borderColor: colors.sky,
+  },
+
+  optionGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: 10,
+  },
+
+  optionBtn: {
+    padding: '14px 16px',
+    background: colors.white,
+    border: `2px solid ${colors.border}`,
+    borderRadius: 12,
+    fontSize: 14,
+    fontWeight: 500,
+    color: colors.textSecondary,
+    cursor: 'pointer',
+    textAlign: 'center',
+    transition: 'all 0.2s',
+  },
+
+  optionBtnActive: {
+    background: '#eef2ff',
+    borderColor: colors.indigo,
+    color: colors.indigo,
+  },
+
+  goalGrid: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+  },
+
+  goalBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 14,
     padding: '16px 18px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
+    background: colors.white,
+    border: `2px solid ${colors.border}`,
     borderRadius: 14,
-    fontSize: 16,
-    color: '#1e293b',
-    outline: 'none',
-    resize: 'none',
-    fontFamily: 'inherit',
-    boxSizing: 'border-box',
+    cursor: 'pointer',
+    textAlign: 'left',
+    transition: 'all 0.2s',
   },
+
+  goalBtnActive: {
+    background: '#eef2ff',
+    borderColor: colors.indigo,
+  },
+
+  goalIcon: {
+    fontSize: 24,
+  },
+
+  goalLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: 500,
+    color: colors.text,
+  },
+
+  goalCheck: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    background: colors.indigo,
+    color: colors.white,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 14,
+    fontWeight: 700,
+  },
+
   textareaLarge: {
     width: '100%',
     padding: '18px 20px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
+    background: colors.white,
+    border: `2px solid ${colors.border}`,
     borderRadius: 16,
     fontSize: 16,
-    color: '#1e293b',
+    color: colors.text,
     outline: 'none',
     resize: 'none',
     fontFamily: 'inherit',
@@ -663,284 +792,53 @@ const styles = {
     boxSizing: 'border-box',
   },
 
-  // ===========================================
-  // SLIDER
-  // ===========================================
-  sliderContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 16,
-    background: 'white',
-    padding: '16px 20px',
-    borderRadius: 14,
-    border: '2px solid #e2e8f0',
-  },
-  slider: {
-    flex: 1,
-    height: 6,
-    borderRadius: 3,
-    appearance: 'none',
-    background: '#e2e8f0',
-    outline: 'none',
-  },
-  sliderValue: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#6366f1',
-    minWidth: 80,
-    textAlign: 'right',
-  },
-
-  // ===========================================
-  // OPTION BUTTONS
-  // ===========================================
-  optionGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: 10,
-  },
-  optionBtn: {
-    padding: '14px 16px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
-    borderRadius: 12,
-    fontSize: 14,
-    fontWeight: 500,
-    color: '#64748b',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    textAlign: 'center',
-  },
-  optionBtnActive: {
-    background: '#f0f0ff',
-    borderColor: '#6366f1',
-    color: '#6366f1',
-  },
-  optionRow: {
-    display: 'flex',
-    gap: 12,
-  },
-  optionBtnLarge: {
-    flex: 1,
-    padding: '18px 20px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
-    borderRadius: 14,
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#64748b',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-
-  // ===========================================
-  // CHECKBOX GRID
-  // ===========================================
-  checkboxGrid: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-  },
-  checkboxBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '14px 16px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
-    borderRadius: 12,
-    fontSize: 15,
-    color: '#64748b',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    textAlign: 'left',
-  },
-  checkboxBtnActive: {
-    background: '#f0f0ff',
-    borderColor: '#6366f1',
-    color: '#6366f1',
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    border: '2px solid #e2e8f0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 14,
-    fontWeight: 700,
-    color: '#6366f1',
-    background: 'white',
-    flexShrink: 0,
-  },
-  checkboxActive: {
-    background: '#6366f1',
-    borderColor: '#6366f1',
-    color: 'white',
-  },
-
-  // ===========================================
-  // GOAL BUTTONS
-  // ===========================================
-  goalGrid: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10,
-  },
-  goalBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    padding: '16px 18px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
-    borderRadius: 14,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    textAlign: 'left',
-    position: 'relative',
-  },
-  goalBtnActive: {
-    background: '#f0f0ff',
-    borderColor: '#6366f1',
-  },
-  goalIcon: {
-    fontSize: 24,
-  },
-  goalLabel: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: 500,
-    color: '#1e293b',
-  },
-  goalCheck: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    background: '#6366f1',
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 14,
-    fontWeight: 700,
-  },
-
-  // ===========================================
-  // COUNTER
-  // ===========================================
-  counterRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24,
-    background: 'white',
-    padding: '16px',
-    borderRadius: 14,
-    border: '2px solid #e2e8f0',
-  },
-  counterBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    background: '#f1f5f9',
-    border: 'none',
-    fontSize: 24,
-    color: '#64748b',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  counterValue: {
-    fontSize: 28,
-    fontWeight: 700,
-    color: '#1e293b',
-    minWidth: 40,
-    textAlign: 'center',
-  },
-
-  // ===========================================
-  // COMFORT OPTIONS
-  // ===========================================
-  comfortOptions: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10,
-  },
-  comfortBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 4,
-    padding: '18px 20px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
-    borderRadius: 14,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    textAlign: 'left',
-  },
-  comfortBtnActive: {
-    background: '#f0f0ff',
-    borderColor: '#6366f1',
-  },
-  comfortLabel: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  comfortDesc: {
-    fontSize: 13,
-    color: '#94a3b8',
-  },
-
-  // ===========================================
-  // COMPLETION NOTE
-  // ===========================================
   completionNote: {
     display: 'flex',
     gap: 16,
     padding: 20,
-    background: '#ecfdf5',
+    background: colors.successLight,
     borderRadius: 16,
     marginTop: 20,
   },
+
   completionTitle: {
     fontSize: 15,
     fontWeight: 600,
     color: '#065f46',
     marginBottom: 4,
   },
+
   completionText: {
     fontSize: 14,
     color: '#047857',
     lineHeight: 1.5,
   },
 
-  // ===========================================
-  // CHAT STYLES
-  // ===========================================
+  // ==========================================
+  // CHAT
+  // ==========================================
   chatContainer: {
     minHeight: '100vh',
-    background: '#f8fafc',
+    background: colors.bgPage,
     maxWidth: 430,
     margin: '0 auto',
     fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
     display: 'flex',
     flexDirection: 'column',
   },
+
   chatHeader: {
     display: 'flex',
     alignItems: 'center',
     padding: '12px 16px',
-    background: 'white',
-    borderBottom: '1px solid #f1f5f9',
+    background: colors.white,
+    borderBottom: `1px solid ${colors.bgLight}`,
     gap: 12,
   },
+
   chatBackBtn: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     background: 'transparent',
     border: 'none',
@@ -949,141 +847,149 @@ const styles = {
     justifyContent: 'center',
     cursor: 'pointer',
   },
+
   chatHeaderCenter: {
     flex: 1,
     display: 'flex',
     alignItems: 'center',
     gap: 12,
   },
+
   chatAdvisorAvatar: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    background: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)',
+    background: gradients.card,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   chatAdvisorName: {
     fontSize: 16,
     fontWeight: 600,
-    color: '#1e293b',
+    color: colors.text,
   },
-  chatAdvisorStatus: {
-    fontSize: 13,
-    color: '#64748b',
+
+  chatLimitsDisplay: {
     display: 'flex',
     alignItems: 'center',
     gap: 6,
+    marginTop: 2,
   },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    background: '#10b981',
+
+  limitBadge: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontWeight: 500,
   },
-  chatMenuBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    background: 'transparent',
-    border: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
+
+  limitDivider: {
+    color: colors.border,
+    fontSize: 12,
   },
+
   chatMessages: {
     flex: 1,
-    padding: '16px',
+    padding: 16,
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
     gap: 16,
   },
+
   messageWrapper: {
     display: 'flex',
     gap: 10,
     alignItems: 'flex-end',
   },
+
   messageAvatar: {
     width: 28,
     height: 28,
     borderRadius: 8,
-    background: '#ecfdf5',
+    background: colors.successLight,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
+
   messageBubble: {
     maxWidth: '80%',
     padding: '12px 16px',
-    borderRadius: 16,
+    borderRadius: 18,
   },
+
   userBubble: {
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+    background: gradients.primary,
     borderBottomRightRadius: 4,
-    color: 'white',
+    color: colors.white,
   },
+
   advisorBubble: {
-    background: 'white',
+    background: colors.white,
     borderBottomLeftRadius: 4,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+    boxShadow: shadows.base,
+    color: colors.text,
   },
+
   messageText: {
     fontSize: 15,
     lineHeight: 1.5,
     margin: 0,
     whiteSpace: 'pre-wrap',
   },
+
   messageTime: {
     fontSize: 11,
     opacity: 0.7,
     display: 'block',
     marginTop: 6,
   },
-  typingIndicator: {
-    display: 'flex',
-    gap: 4,
-    padding: '4px 0',
-  },
-  typingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    background: '#94a3b8',
-    animation: 'pulse 1.4s infinite',
-  },
+
   quickPrompts: {
     padding: '0 16px 16px',
     display: 'flex',
     flexWrap: 'wrap',
     gap: 8,
   },
+
   quickPromptBtn: {
     padding: '10px 14px',
-    background: 'white',
-    border: '1px solid #e2e8f0',
+    background: colors.white,
+    border: `1px solid ${colors.border}`,
     borderRadius: 20,
     fontSize: 13,
-    color: '#64748b',
+    color: colors.textSecondary,
     cursor: 'pointer',
     transition: 'all 0.2s',
   },
+
   chatInputArea: {
-    padding: '12px 16px 24px',
-    background: 'white',
-    borderTop: '1px solid #f1f5f9',
+    padding: '12px 16px 28px',
+    background: colors.white,
+    borderTop: `1px solid ${colors.bgLight}`,
   },
+
+  inputLimitIndicator: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    fontSize: 12,
+    marginBottom: 8,
+    padding: '0 4px',
+    color: colors.textMuted,
+  },
+
   chatInputWrapper: {
     display: 'flex',
     alignItems: 'flex-end',
     gap: 10,
-    background: '#f8fafc',
+    background: colors.bgPage,
     borderRadius: 16,
     padding: '8px 8px 8px 16px',
   },
+
   chatInput: {
     flex: 1,
     border: 'none',
@@ -1094,908 +1000,191 @@ const styles = {
     fontFamily: 'inherit',
     padding: '8px 0',
     maxHeight: 100,
+    color: colors.text,
   },
+
   chatSendBtn: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: 12,
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+    background: gradients.primary,
     border: 'none',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    color: 'white',
+    color: colors.white,
     flexShrink: 0,
+    boxShadow: shadows.primary,
   },
+
   chatDisclaimer: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: colors.textMuted,
     textAlign: 'center',
     marginTop: 8,
   },
 
-  // ===========================================
-  // ACCOUNT LINKING STYLES
-  // ===========================================
-  linkingContainer: {
-    minHeight: '100vh',
-    background: '#f8fafc',
-    position: 'relative',
-    maxWidth: 430,
-    margin: '0 auto',
-    fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-  },
-  linkingGradient: {
-    position: 'absolute',
+  // ==========================================
+  // MODALS
+  // ==========================================
+  modalOverlay: {
+    position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
-    height: 200,
-    background: 'linear-gradient(135deg, #e0e7ff 0%, #fae8ff 50%, #fce7f3 100%)',
-    zIndex: 0,
-  },
-  linkingHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '16px 20px',
-    position: 'relative',
-    zIndex: 1,
-  },
-  linkingTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  linkingMain: {
-    padding: '20px',
-    position: 'relative',
-    zIndex: 1,
-  },
-  linkingIntro: {
-    textAlign: 'center',
-    paddingTop: 20,
-  },
-  linkingIconLarge: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    background: 'white',
+    bottom: 0,
+    background: 'rgba(0, 0, 0, 0.5)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: '0 auto 24px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+    padding: 20,
+    zIndex: 1000,
   },
-  linkingHeadline: {
-    fontSize: 24,
-    fontWeight: 700,
-    color: '#1e293b',
-    marginBottom: 12,
-  },
-  linkingSubtext: {
-    fontSize: 15,
-    color: '#64748b',
-    lineHeight: 1.6,
-    marginBottom: 32,
-  },
-  trustPoints: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16,
-    marginBottom: 32,
-    textAlign: 'left',
-  },
-  trustPoint: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    fontSize: 14,
-    color: '#1e293b',
-  },
-  linkingPrimaryBtn: {
+
+  modalContent: {
+    background: colors.white,
+    borderRadius: 24,
+    padding: 28,
+    maxWidth: 340,
     width: '100%',
-    padding: '16px 24px',
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    border: 'none',
-    borderRadius: 14,
-    fontSize: 16,
-    fontWeight: 600,
-    color: 'white',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginBottom: 12,
+    textAlign: 'center',
   },
-  linkingSecondaryBtn: {
-    width: '100%',
-    padding: '16px 24px',
-    background: 'transparent',
-    border: 'none',
-    borderRadius: 14,
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#64748b',
-    cursor: 'pointer',
-  },
-  linkingSelect: {
-    paddingTop: 20,
-  },
-  selectTitle: {
+
+  modalTitle: {
     fontSize: 20,
     fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: 20,
+    color: colors.text,
+    marginBottom: 12,
   },
-  searchBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '14px 18px',
-    background: 'white',
-    borderRadius: 14,
-    marginBottom: 20,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-  },
-  searchInput: {
-    flex: 1,
-    border: 'none',
-    background: 'transparent',
+
+  modalText: {
     fontSize: 15,
-    outline: 'none',
+    color: colors.textSecondary,
+    marginBottom: 24,
+    lineHeight: 1.5,
   },
-  institutionGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: 12,
-    marginBottom: 20,
-  },
-  institutionBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 8,
-    padding: '20px',
-    background: 'white',
-    border: '2px solid #e2e8f0',
-    borderRadius: 16,
+
+  modalPrimaryBtn: {
+    width: '100%',
+    padding: '14px 20px',
+    background: gradients.primary,
+    border: 'none',
+    borderRadius: 14,
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    marginBottom: 12,
+    boxShadow: shadows.primary,
   },
-  institutionIcon: {
-    fontSize: 28,
-  },
-  institutionName: {
-    fontSize: 14,
+
+  modalSecondaryBtn: {
+    width: '100%',
+    padding: '14px 20px',
+    background: 'transparent',
+    border: 'none',
+    borderRadius: 14,
+    color: colors.textSecondary,
+    fontSize: 15,
     fontWeight: 500,
-    color: '#1e293b',
-    textAlign: 'center',
+    cursor: 'pointer',
   },
-  institutionHint: {
-    fontSize: 13,
-    color: '#94a3b8',
-    textAlign: 'center',
-  },
-  linkingConnecting: {
-    textAlign: 'center',
-    paddingTop: 60,
-  },
-  connectingSpinner: {
-    width: 80,
-    height: 80,
-    margin: '0 auto 24px',
-    position: 'relative',
-  },
-  spinnerRing: {
-    width: '100%',
-    height: '100%',
-    border: '4px solid #e2e8f0',
-    borderTopColor: '#6366f1',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-  },
-  connectingTitle: {
-    fontSize: 20,
-    fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  connectingText: {
-    fontSize: 15,
-    color: '#64748b',
-    marginBottom: 32,
-  },
-  connectingSteps: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16,
-    textAlign: 'left',
-    maxWidth: 280,
-    margin: '0 auto',
-  },
-  connectingStep: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    fontSize: 14,
-    color: '#1e293b',
-  },
-  stepSpinner: {
-    width: 16,
-    height: 16,
-    border: '2px solid #e2e8f0',
-    borderTopColor: '#6366f1',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-  },
-  stepCircle: {
-    width: 16,
-    height: 16,
-    border: '2px solid #e2e8f0',
-    borderRadius: '50%',
-  },
-  linkingSuccess: {
-    textAlign: 'center',
-    paddingTop: 40,
-  },
+
   successIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    background: '#ecfdf5',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    background: colors.successLight,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: '0 auto 24px',
-  },
-  successTitle: {
-    fontSize: 22,
-    fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  successText: {
-    fontSize: 15,
-    color: '#64748b',
-    marginBottom: 32,
-    lineHeight: 1.5,
-  },
-  connectedAccounts: {
-    background: 'white',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    textAlign: 'left',
-  },
-  connectedLabel: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#64748b',
-    marginBottom: 16,
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  connectedAccount: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    padding: '12px 0',
-    borderBottom: '1px solid #f1f5f9',
-  },
-  accountIcon: {
-    fontSize: 24,
-  },
-  accountInfo: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 2,
-  },
-  accountName: {
-    fontSize: 15,
-    fontWeight: 500,
-    color: '#1e293b',
-  },
-  accountType: {
-    fontSize: 13,
-    color: '#64748b',
+    margin: '0 auto 16px',
   },
 
-  // ===========================================
-  // PLAN VIEW STYLES
-  // ===========================================
-  priorityCard: {
-    background: 'white',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-  },
-  priorityHeader: {
+  // ==========================================
+  // TYPING INDICATOR
+  // ==========================================
+  typingIndicator: {
     display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-  },
-  priorityTitle: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  priorityList: {
-    listStyle: 'none',
-    padding: 0,
-    margin: '0 0 16px 0',
-  },
-  priorityItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '12px 0',
-    borderBottom: '1px solid #f1f5f9',
-    fontSize: 15,
-    color: '#1e293b',
-  },
-  priorityNumber: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    background: '#6366f1',
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 13,
-    fontWeight: 600,
-  },
-  priorityWhy: {
-    fontSize: 14,
-    color: '#64748b',
-    lineHeight: 1.6,
-    background: '#f8fafc',
-    padding: 16,
-    borderRadius: 12,
-  },
-  goalsSection: {
-    marginBottom: 24,
-  },
-  goalsList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  },
-  goalCard: {
-    background: 'white',
-    borderRadius: 16,
-    padding: 20,
-    boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-  },
-  goalHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 12,
-  },
-  goalInfo: {
-    flex: 1,
-  },
-  goalTimeline: {
-    fontSize: 13,
-    color: '#64748b',
-  },
-  goalPercent: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: '#6366f1',
-  },
-  goalProgressBar: {
-    height: 8,
-    background: '#e2e8f0',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 12,
-  },
-  goalProgressFill: {
-    height: '100%',
-    background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)',
-    borderRadius: 4,
-    transition: 'width 0.3s ease',
-  },
-  goalMeta: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: 13,
-    color: '#64748b',
-  },
-  emptyGoals: {
-    background: 'white',
-    borderRadius: 16,
-    padding: 32,
-    textAlign: 'center',
-    color: '#64748b',
-  },
-  allocationCard: {
-    background: 'white',
-    borderRadius: 20,
-    padding: 20,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-  },
-  allocationList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-    marginBottom: 16,
-  },
-  allocationItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-  },
-  allocationDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  allocationLabel: {
-    flex: 1,
-    fontSize: 15,
-    color: '#1e293b',
-  },
-  allocationAmount: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  allocationNote: {
-    fontSize: 13,
-    color: '#94a3b8',
-    fontStyle: 'italic',
-  },
-
-  // ===========================================
-  // LEARN VIEW STYLES
-  // ===========================================
-  learnSection: {
-    marginBottom: 28,
-  },
-  learnSectionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-  },
-  recommendedBadge: {
-    fontSize: 12,
-    color: '#6366f1',
-    background: '#f0f0ff',
-    padding: '4px 10px',
-    borderRadius: 12,
-  },
-  lessonsList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-  },
-  lessonCard: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: 14,
-    padding: 16,
-    background: 'white',
-    border: 'none',
-    borderRadius: 16,
-    cursor: 'pointer',
-    textAlign: 'left',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    width: '100%',
-  },
-  lessonIcon: {
-    fontSize: 28,
-    flexShrink: 0,
-  },
-  lessonContent: {
-    flex: 1,
-  },
-  lessonTitle: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1e293b',
-    display: 'block',
-    marginBottom: 4,
-  },
-  lessonDescription: {
-    fontSize: 13,
-    color: '#64748b',
-    lineHeight: 1.5,
-    display: 'block',
-    marginBottom: 8,
-  },
-  lessonMeta: {
-    display: 'flex',
-    gap: 12,
-  },
-  lessonCategory: {
-    fontSize: 12,
-    color: '#6366f1',
-    background: '#f0f0ff',
-    padding: '2px 8px',
-    borderRadius: 8,
-  },
-  lessonDuration: {
-    fontSize: 12,
-    color: '#94a3b8',
-  },
-  philosophyCard: {
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    borderRadius: 20,
-    padding: 24,
-    color: 'white',
-  },
-  philosophyTitle: {
-    fontSize: 17,
-    fontWeight: 600,
-    marginBottom: 8,
-  },
-  philosophyText: {
-    fontSize: 14,
-    lineHeight: 1.6,
-    opacity: 0.9,
-  },
-
-  // ===========================================
-  // PROGRESS VIEW STYLES
-  // ===========================================
-  progressCard: {
-    background: 'white',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-  },
-  progressCardHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  progressCardTitle: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  progressTrend: {
-    fontSize: 13,
-    color: '#10b981',
-    display: 'flex',
-    alignItems: 'center',
     gap: 4,
-  },
-  netWorthValue: {
-    fontSize: 32,
-    fontWeight: 700,
-    color: '#1e293b',
-    marginBottom: 20,
-  },
-  chartPlaceholder: {
-    display: 'flex',
-    alignItems: 'flex-end',
-    gap: 8,
-    height: 80,
-    marginBottom: 8,
-  },
-  chartBar: {
-    flex: 1,
-    height: '45%',
-    background: 'linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%)',
-    borderRadius: 4,
-  },
-  chartLabels: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: 11,
-    color: '#94a3b8',
-  },
-  metricsGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: 12,
-    marginBottom: 20,
-  },
-  metricCard: {
-    background: 'white',
-    borderRadius: 16,
-    padding: 16,
-    boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-  },
-  metricLabel: {
-    fontSize: 13,
-    color: '#64748b',
-    display: 'block',
-    marginBottom: 4,
-  },
-  metricValue: {
-    fontSize: 22,
-    fontWeight: 700,
-    color: '#1e293b',
-    display: 'block',
-  },
-  metricSub: {
-    fontSize: 12,
-    color: '#94a3b8',
-  },
-  milestonesCard: {
-    background: 'white',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-  },
-  milestonesList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 0,
-  },
-  milestoneItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    padding: '14px 0',
-    borderBottom: '1px solid #f1f5f9',
-  },
-  milestoneIconComplete: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    background: '#10b981',
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 12,
-    fontWeight: 700,
-  },
-  milestoneIconPending: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    border: '2px solid #e2e8f0',
-    color: '#94a3b8',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 12,
-  },
-  milestoneInfo: {
-    flex: 1,
-  },
-  milestoneName: {
-    fontSize: 15,
-    fontWeight: 500,
-    color: '#1e293b',
-    display: 'block',
-  },
-  milestoneNamePending: {
-    fontSize: 15,
-    fontWeight: 500,
-    color: '#94a3b8',
-    display: 'block',
-  },
-  milestoneDate: {
-    fontSize: 13,
-    color: '#64748b',
-  },
-  encouragementCard: {
-    background: '#ecfdf5',
-    borderRadius: 16,
-    padding: 20,
-    display: 'flex',
-    gap: 16,
-    alignItems: 'flex-start',
-  },
-  encouragementEmoji: {
-    fontSize: 24,
-  },
-  encouragementText: {
-    fontSize: 14,
-    color: '#047857',
-    lineHeight: 1.6,
-    margin: 0,
-  },
-  emptyProgress: {
-    textAlign: 'center',
-    paddingTop: 60,
-  },
-  emptyIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    background: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 24px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: '#64748b',
-    lineHeight: 1.6,
-    marginBottom: 24,
-  },
-  emptyBtn: {
-    padding: '14px 28px',
-    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-    border: 'none',
-    borderRadius: 12,
-    fontSize: 15,
-    fontWeight: 600,
-    color: 'white',
-    cursor: 'pointer',
+    padding: '4px 0',
   },
 
-  // ===========================================
-  // MESSAGES VIEW STYLES
-  // ===========================================
-  messagesHeader: {
+  typingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+    background: colors.textMuted,
+    animation: 'pulse 1.4s infinite',
+  },
+
+  // ==========================================
+  // GREETING
+  // ==========================================
+  greeting: {
+    marginBottom: 20,
+  },
+
+  greetingText: {
+    fontSize: 22,
+    fontWeight: 600,
+    color: colors.text,
+  },
+
+  // ==========================================
+  // MENU DROPDOWN
+  // ==========================================
+  menuContainer: {
+    position: 'relative',
+  },
+
+  menuDropdown: {
+    position: 'absolute',
+    top: '100%',
+    right: 0,
+    marginTop: 8,
+    background: colors.white,
+    borderRadius: 14,
+    boxShadow: shadows.lg,
+    overflow: 'hidden',
+    minWidth: 180,
+    zIndex: 100,
+  },
+
+  menuItem: {
     display: 'flex',
     alignItems: 'center',
-    padding: '16px 20px',
-    position: 'relative',
-    zIndex: 1,
-    background: 'transparent',
-  },
-  messagesTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  markAllBtn: {
+    gap: 12,
+    width: '100%',
+    padding: '14px 16px',
     background: 'none',
     border: 'none',
     fontSize: 14,
-    color: '#6366f1',
-    cursor: 'pointer',
-    fontWeight: 500,
-  },
-  filterPills: {
-    display: 'flex',
-    gap: 8,
-    padding: '0 20px 16px',
-    position: 'relative',
-    zIndex: 1,
-    overflowX: 'auto',
-  },
-  filterPill: {
-    padding: '8px 16px',
-    background: 'rgba(255,255,255,0.7)',
-    border: 'none',
-    borderRadius: 16,
-    fontSize: 14,
-    fontWeight: 500,
-    color: '#64748b',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  },
-  filterPillActive: {
-    background: 'white',
-    color: '#6366f1',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-  },
-  messagesMain: {
-    padding: '0 20px 100px',
-    position: 'relative',
-    zIndex: 1,
-  },
-  messagesList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-    marginBottom: 24,
-  },
-  messageItem: {
-    display: 'flex',
-    gap: 14,
-    padding: 16,
-    background: 'white',
-    border: 'none',
-    borderRadius: 16,
+    color: colors.text,
     cursor: 'pointer',
     textAlign: 'left',
-    width: '100%',
-    position: 'relative',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    borderBottom: `1px solid ${colors.bgLight}`,
   },
-  messageItemUnread: {
-    background: '#fefefe',
-    boxShadow: '0 2px 12px rgba(99, 102, 241, 0.1)',
+
+  menuItemLast: {
+    borderBottom: 'none',
   },
-  messageIcon: {
-    fontSize: 24,
-    flexShrink: 0,
-  },
-  messageContent: {
-    flex: 1,
-    minWidth: 0,
-  },
-  messageHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 4,
-  },
-  messageTitle: {
-    fontSize: 15,
-    color: '#1e293b',
-    marginRight: 8,
-  },
-  messageTime: {
-    fontSize: 12,
-    color: '#94a3b8',
-    flexShrink: 0,
-  },
-  messagePreview: {
-    fontSize: 14,
-    color: '#64748b',
-    lineHeight: 1.5,
-    margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-  },
-  unreadDot: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 10,
-    height: 10,
-    background: '#6366f1',
-    borderRadius: '50%',
-  },
-  emptyMessages: {
-    textAlign: 'center',
-    padding: 40,
-    color: '#94a3b8',
-  },
-  preferencesCard: {
-    background: 'white',
-    borderRadius: 16,
-    padding: 20,
-  },
-  preferencesTitle: {
-    fontSize: 15,
+
+  // ==========================================
+  // INLINE LINK
+  // ==========================================
+  inlineLink: {
+    background: 'none',
+    border: 'none',
+    color: colors.indigo,
+    fontSize: 'inherit',
     fontWeight: 600,
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  preferencesText: {
-    fontSize: 14,
-    color: '#64748b',
-    lineHeight: 1.5,
-    marginBottom: 16,
-  },
-  preferencesBtn: {
-    padding: '12px 20px',
-    background: '#f8fafc',
-    border: '1px solid #e2e8f0',
-    borderRadius: 10,
-    fontSize: 14,
-    fontWeight: 500,
-    color: '#64748b',
     cursor: 'pointer',
+    padding: 0,
+    textDecoration: 'underline',
+    textUnderlineOffset: 2,
   },
 };
 
-export default styles;
+export default { styles, colors, gradients, shadows, KUMO_URL };
