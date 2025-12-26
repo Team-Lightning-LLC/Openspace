@@ -1,424 +1,509 @@
-import React, { useState } from 'react';
-import { styles, colors, gradients } from './styles';
+import React, { useState, useRef, useEffect } from 'react';
+import { styles, colors, gradients, KUMO_URL } from './styles';
 
-const TOTAL_STEPS = 5;
+// ============================================
+// CONSTANTS
+// ============================================
+const MAX_MESSAGE_LENGTH = 500;
+const MAX_MESSAGES_PER_CHAT = 20;
+const MAX_CHATS_PER_DAY = 10;
+const STORAGE_KEY = 'openspace_advisor_usage';
 
-export default function OnboardingFlow({
-  step,
-  setStep,
-  formData,
-  updateForm,
-  toggleGoal,
-  toggleArrayItem,
-  onComplete,
-  onExit,
+// ============================================
+// MAIN COMPONENT
+// ============================================
+export default function AdvisorChat({
+  userName,
+  userProfile,
+  onNavigate,
+  onOpenScheduler,
+  onSaveChat,
 }) {
-  const [focusedInput, setFocusedInput] = useState(null);
-
-  const canContinue = () => {
-    switch (step) {
-      case 0:
-        return formData.name && formData.email;
-      case 1:
-        return formData.income && formData.savings;
-      case 2:
-        return formData.hasDebt !== null && (formData.hasDebt === false || formData.debtStress);
-      case 3:
-        return formData.goals.length >= 1;
-      case 4:
-        return true;
-      default:
-        return false;
-    }
-  };
-
-  const handleContinue = () => {
-    if (step < TOTAL_STEPS - 1) {
-      setStep(step + 1);
-    } else {
-      onComplete();
-    }
-  };
-
-  const handleBack = () => {
-    if (step > 0) {
-      setStep(step - 1);
-    } else {
-      onExit();
-    }
-  };
-
-  return (
-    <div style={styles.onboardingContainer}>
-      <div style={styles.backgroundGradient} />
-      
-      {/* Header */}
-      <header style={styles.onboardingHeader}>
-        <button style={styles.backBtn} onClick={handleBack}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.text} strokeWidth="2">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        </button>
-        
-        <div style={styles.progressContainer}>
-          <div style={styles.progressBar}>
-            <div 
-              style={{
-                ...styles.progressFill,
-                width: `${((step + 1) / TOTAL_STEPS) * 100}%`
-              }} 
-            />
-          </div>
-          <span style={styles.progressText}>{step + 1} of {TOTAL_STEPS}</span>
-        </div>
-        
-        {/* Spacer to center progress */}
-        <div style={{ width: 44 }} />
-      </header>
-
-      {/* Main Content */}
-      <main style={styles.onboardingMain}>
-        {step === 0 && (
-          <Step1Basics 
-            formData={formData} 
-            updateForm={updateForm}
-            focusedInput={focusedInput}
-            setFocusedInput={setFocusedInput}
-          />
-        )}
-        {step === 1 && (
-          <Step2Money 
-            formData={formData} 
-            updateForm={updateForm}
-          />
-        )}
-        {step === 2 && (
-          <Step3Debt 
-            formData={formData} 
-            updateForm={updateForm}
-          />
-        )}
-        {step === 3 && (
-          <Step4Goals 
-            formData={formData} 
-            toggleGoal={toggleGoal}
-          />
-        )}
-        {step === 4 && (
-          <Step5Final 
-            formData={formData} 
-            updateForm={updateForm}
-          />
-        )}
-      </main>
-
-      {/* Footer */}
-      <div style={styles.onboardingFooter}>
-        <button
-          style={{
-            ...styles.continueBtn,
-            opacity: canContinue() ? 1 : 0.5,
-            cursor: canContinue() ? 'pointer' : 'not-allowed',
-          }}
-          onClick={handleContinue}
-          disabled={!canContinue()}
-        >
-          {step === TOTAL_STEPS - 1 ? 'Complete Setup' : 'Continue'}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// STEP 1: BASICS
-// ============================================
-function Step1Basics({ formData, updateForm, focusedInput, setFocusedInput }) {
-  return (
-    <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>Let's start simple</h1>
-      <p style={styles.stepSubtitle}>Just the basics so we know who we're talking to.</p>
-
-      <div style={styles.formGroup}>
-        <label style={styles.label}>What should we call you?</label>
-        <input
-          type="text"
-          placeholder="Your first name"
-          value={formData.name}
-          onChange={(e) => updateForm('name', e.target.value)}
-          onFocus={() => setFocusedInput('name')}
-          onBlur={() => setFocusedInput(null)}
-          style={{
-            ...styles.input,
-            ...(focusedInput === 'name' ? styles.inputFocus : {})
-          }}
-        />
-      </div>
-
-      <div style={styles.formGroup}>
-        <label style={styles.label}>How can we reach you?</label>
-        <input
-          type="email"
-          placeholder="Email address"
-          value={formData.email}
-          onChange={(e) => updateForm('email', e.target.value)}
-          onFocus={() => setFocusedInput('email')}
-          onBlur={() => setFocusedInput(null)}
-          style={{
-            ...styles.input,
-            ...(focusedInput === 'email' ? styles.inputFocus : {}),
-            marginBottom: 12
-          }}
-        />
-        <input
-          type="tel"
-          placeholder="Phone number (optional)"
-          value={formData.phone}
-          onChange={(e) => updateForm('phone', e.target.value)}
-          onFocus={() => setFocusedInput('phone')}
-          onBlur={() => setFocusedInput(null)}
-          style={{
-            ...styles.input,
-            ...(focusedInput === 'phone' ? styles.inputFocus : {})
-          }}
-        />
-      </div>
-
-      <div style={styles.formGroup}>
-        <label style={styles.label}>What do you do for work?</label>
-        <input
-          type="text"
-          placeholder="e.g., Teacher, Nurse, Freelancer, Between jobs..."
-          value={formData.work}
-          onChange={(e) => updateForm('work', e.target.value)}
-          onFocus={() => setFocusedInput('work')}
-          onBlur={() => setFocusedInput(null)}
-          style={{
-            ...styles.input,
-            ...(focusedInput === 'work' ? styles.inputFocus : {})
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// STEP 2: MONEY
-// ============================================
-function Step2Money({ formData, updateForm }) {
-  const incomeOptions = [
-    'Under $30K', '$30K - $50K', '$50K - $75K', 
-    '$75K - $100K', '$100K - $150K', '$150K+'
-  ];
+  // Messages state
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [chatEnded, setChatEnded] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   
-  const savingsOptions = [
-    'Under $1K', '$1K - $5K', '$5K - $15K',
-    '$15K - $50K', '$50K - $100K', '$100K+'
-  ];
+  // Usage tracking
+  const [usage, setUsage] = useState(() => getUsageFromStorage());
+  
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
-  return (
-    <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>Your money right now</h1>
-      <p style={styles.stepSubtitle}>A rough picture is all we need. No judgment here.</p>
+  // Count user messages
+  const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const totalMessageCount = messages.length;
+  const messagesRemaining = MAX_MESSAGES_PER_CHAT - totalMessageCount;
 
-      <div style={styles.formGroup}>
-        <label style={styles.label}>Roughly, what do you earn per year after taxes?</label>
-        <div style={styles.optionGrid}>
-          {incomeOptions.map(option => (
-            <button
-              key={option}
-              onClick={() => updateForm('income', option)}
-              style={{
-                ...styles.optionBtn,
-                ...(formData.income === option ? styles.optionBtnActive : {})
-              }}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </div>
+  // Check daily limit
+  const dailyLimitReached = usage.chatsToday >= MAX_CHATS_PER_DAY;
 
-      <div style={styles.formGroup}>
-        <label style={styles.label}>How much do you have saved — all accounts combined?</label>
-        <div style={styles.optionGrid}>
-          {savingsOptions.map(option => (
-            <button
-              key={option}
-              onClick={() => updateForm('savings', option)}
-              style={{
-                ...styles.optionBtn,
-                ...(formData.savings === option ? styles.optionBtnActive : {})
-              }}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+  // Initialize with greeting
+  useEffect(() => {
+    if (messages.length === 0 && !dailyLimitReached) {
+      const greeting = {
+        role: 'advisor',
+        content: `Hi${userName ? ` ${userName}` : ''}! I am here to help you navigate your day-to-day financial questions.\n\nFor meaningful changes to your overall approach, schedule time with your AI Advisor.`,
+        time: new Date(),
+        hasScheduleLink: true,
+      };
+      setMessages([greeting]);
+      
+      // Increment chat count
+      incrementChatCount();
+    }
+  }, []);
 
-// ============================================
-// STEP 3: DEBT
-// ============================================
-function Step3Debt({ formData, updateForm }) {
-  const stressOptions = [
-    'Not at all', 'A little', 'Moderately', 'Yes, significantly'
-  ];
+  // Auto-scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  return (
-    <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>Let's talk about debt</h1>
-      <p style={styles.stepSubtitle}>Understanding your situation helps us give better guidance.</p>
+  // ==========================================
+  // USAGE TRACKING
+  // ==========================================
+  function getUsageFromStorage() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const data = JSON.parse(stored);
+        const today = new Date().toDateString();
+        if (data.date === today) {
+          return data;
+        }
+      }
+    } catch (e) {}
+    return { date: new Date().toDateString(), chatsToday: 0 };
+  }
 
-      <div style={styles.formGroup}>
-        <label style={styles.label}>Do you have any debt right now?</label>
-        <div style={{ ...styles.optionGrid, gridTemplateColumns: '1fr 1fr' }}>
-          <button
-            onClick={() => updateForm('hasDebt', true)}
-            style={{
-              ...styles.optionBtn,
-              ...(formData.hasDebt === true ? styles.optionBtnActive : {})
-            }}
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => updateForm('hasDebt', false)}
-            style={{
-              ...styles.optionBtn,
-              ...(formData.hasDebt === false ? styles.optionBtnActive : {})
-            }}
-          >
-            No
-          </button>
-        </div>
-      </div>
+  function incrementChatCount() {
+    const today = new Date().toDateString();
+    const newUsage = {
+      date: today,
+      chatsToday: usage.date === today ? usage.chatsToday + 1 : 1
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newUsage));
+    setUsage(newUsage);
+  }
 
-      {formData.hasDebt && (
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Does your debt cause you stress?</label>
-          <div style={styles.goalGrid}>
-            {stressOptions.map(option => (
-              <button
-                key={option}
-                onClick={() => updateForm('debtStress', option)}
-                style={{
-                  ...styles.goalBtn,
-                  ...(formData.debtStress === option ? styles.goalBtnActive : {})
-                }}
-              >
-                <span style={styles.goalLabel}>{option}</span>
-                {formData.debtStress === option && (
-                  <span style={styles.goalCheck}>✓</span>
-                )}
-              </button>
-            ))}
+  // ==========================================
+  // MESSAGE HANDLING
+  // ==========================================
+  const handleSend = async () => {
+    if (!inputValue.trim() || isTyping || chatEnded) return;
+    if (totalMessageCount >= MAX_MESSAGES_PER_CHAT - 1) {
+      setChatEnded(true);
+      return;
+    }
+
+    const userMessage = {
+      role: 'user',
+      content: inputValue.trim().slice(0, MAX_MESSAGE_LENGTH),
+      time: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
+
+    // Simulate response
+    setTimeout(() => {
+      const response = getFallbackResponse(userMessage.content, userProfile);
+      setMessages(prev => [...prev, {
+        role: 'advisor',
+        content: response,
+        time: new Date(),
+      }]);
+      setIsTyping(false);
+
+      // Check if this was the last message
+      if (totalMessageCount + 2 >= MAX_MESSAGES_PER_CHAT) {
+        setChatEnded(true);
+      }
+    }, 1500);
+  };
+
+  const handleQuickPrompt = (prompt) => {
+    setInputValue(prompt);
+    inputRef.current?.focus();
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  // ==========================================
+  // SAVE/END CHAT
+  // ==========================================
+  const handleEndChat = () => {
+    setShowSaveModal(true);
+  };
+
+  const handleSave = () => {
+    if (onSaveChat) {
+      onSaveChat({
+        messages,
+        timestamp: new Date(),
+        summary: messages[1]?.content?.slice(0, 100) || 'Chat conversation',
+      });
+    }
+    setShowSaveModal(false);
+    onNavigate('home', 'home');
+  };
+
+  const handleDiscard = () => {
+    setShowSaveModal(false);
+    onNavigate('home', 'home');
+  };
+
+  // ==========================================
+  // RENDER: DAILY LIMIT REACHED
+  // ==========================================
+  if (dailyLimitReached) {
+    return (
+      <div style={styles.chatContainer}>
+        <ChatHeader 
+          onBack={() => onNavigate('home', 'home')}
+          chatNumber={usage.chatsToday}
+          messageCount={0}
+        />
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 32,
+          textAlign: 'center',
+        }}>
+          <div style={{
+            width: 80,
+            height: 80,
+            borderRadius: 20,
+            background: gradients.card,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 24,
+          }}>
+            <img src={KUMO_URL} alt="" style={{ width: 48, height: 48, objectFit: 'contain' }} />
           </div>
+          <h2 style={{ fontSize: 22, fontWeight: 600, color: colors.text, marginBottom: 12 }}>
+            You have used all 10 chats today
+          </h2>
+          <p style={{ fontSize: 15, color: colors.textSecondary, marginBottom: 24, lineHeight: 1.5 }}>
+            Your daily limit resets at midnight. For deeper guidance, schedule time with your AI Advisor.
+          </p>
+          <button
+            style={styles.buttonPrimary}
+            onClick={onOpenScheduler}
+          >
+            Schedule Full Session
+          </button>
         </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // RENDER: MAIN CHAT
+  // ==========================================
+  return (
+    <div style={styles.chatContainer}>
+      <ChatHeader 
+        onBack={handleEndChat}
+        chatNumber={usage.chatsToday}
+        messageCount={totalMessageCount}
+        showMenu={showMenu}
+        setShowMenu={setShowMenu}
+        onSave={() => setShowSaveModal(true)}
+        onEndChat={handleEndChat}
+      />
+
+      {/* Messages */}
+      <div style={styles.chatMessages}>
+        {messages.map((msg, i) => (
+          <MessageBubble 
+            key={i} 
+            message={msg} 
+            onScheduleClick={onOpenScheduler}
+          />
+        ))}
+        
+        {isTyping && (
+          <div style={{ ...styles.messageWrapper, justifyContent: 'flex-start' }}>
+            <div style={styles.messageAvatar}>
+              <img src={KUMO_URL} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+            </div>
+            <div style={{ ...styles.messageBubble, ...styles.advisorBubble }}>
+              <TypingIndicator />
+            </div>
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Quick Prompts */}
+      {messages.length <= 2 && !chatEnded && (
+        <div style={styles.quickPrompts}>
+          {['How am I doing?', 'Help with debt', 'Is this worth buying?'].map(prompt => (
+            <button
+              key={prompt}
+              style={styles.quickPromptBtn}
+              onClick={() => handleQuickPrompt(prompt)}
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Input Area */}
+      {!chatEnded ? (
+        <div style={styles.chatInputArea}>
+          <div style={styles.inputLimitIndicator}>
+            <span style={{ color: messagesRemaining <= 4 ? colors.warning : colors.textMuted }}>
+              {messagesRemaining} messages left
+            </span>
+          </div>
+          <div style={styles.chatInputWrapper}>
+            <textarea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask anything..."
+              rows={1}
+              style={styles.chatInput}
+            />
+            <button
+              style={{
+                ...styles.chatSendBtn,
+                opacity: inputValue.trim() && !isTyping ? 1 : 0.5,
+              }}
+              onClick={handleSend}
+              disabled={!inputValue.trim() || isTyping}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+          <p style={styles.chatDisclaimer}>
+            {inputValue.length}/{MAX_MESSAGE_LENGTH}
+          </p>
+        </div>
+      ) : (
+        <div style={styles.chatInputArea}>
+          <p style={{ textAlign: 'center', color: colors.textSecondary, marginBottom: 16 }}>
+            This chat has ended
+          </p>
+          <button style={styles.buttonPrimary} onClick={() => setShowSaveModal(true)}>
+            Save & Close
+          </button>
+        </div>
+      )}
+
+      {/* Save Modal */}
+      {showSaveModal && (
+        <SaveModal 
+          onSave={handleSave}
+          onDiscard={handleDiscard}
+          onCancel={() => setShowSaveModal(false)}
+        />
       )}
     </div>
   );
 }
 
 // ============================================
-// STEP 4: GOALS
+// CHAT HEADER
 // ============================================
-function Step4Goals({ formData, toggleGoal }) {
-  const goals = [
-    { id: 'emergency', icon: '🛡️', label: 'Build emergency savings' },
-    { id: 'debt', icon: '💳', label: 'Pay off debt' },
-    { id: 'invest', icon: '📈', label: 'Start investing' },
-    { id: 'retire', icon: '🏖️', label: 'Plan for retirement' },
-    { id: 'home', icon: '🏠', label: 'Save for a home' },
-    { id: 'breathing', icon: '😮‍💨', label: 'Just get breathing room' },
-  ];
+function ChatHeader({ onBack, chatNumber, messageCount, showMenu, setShowMenu, onSave, onEndChat }) {
+  return (
+    <header style={styles.chatHeader}>
+      <button style={styles.chatBackBtn} onClick={onBack}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.text} strokeWidth="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <div style={styles.chatHeaderCenter}>
+        <div style={styles.chatAdvisorAvatar}>
+          <img src={KUMO_URL} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} />
+        </div>
+        <div>
+          <div style={styles.chatAdvisorName}>Daily Advisor</div>
+          <div style={styles.chatLimitsDisplay}>
+            <span style={styles.limitBadge}>Chat {chatNumber}/{MAX_CHATS_PER_DAY}</span>
+            <span style={styles.limitDivider}>•</span>
+            <span style={styles.limitBadge}>Msg {messageCount}/{MAX_MESSAGES_PER_CHAT}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={styles.menuContainer}>
+        <button style={styles.cardMenu} onClick={() => setShowMenu && setShowMenu(!showMenu)}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.textMuted} strokeWidth="2">
+            <circle cx="12" cy="12" r="1"/>
+            <circle cx="12" cy="5" r="1"/>
+            <circle cx="12" cy="19" r="1"/>
+          </svg>
+        </button>
+        
+        {showMenu && (
+          <div style={styles.menuDropdown}>
+            <button style={styles.menuItem} onClick={() => { setShowMenu(false); onSave(); }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Save chat
+            </button>
+            <button style={{ ...styles.menuItem, ...styles.menuItemLast }} onClick={() => { setShowMenu(false); onEndChat(); }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              End chat
+            </button>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
+
+// ============================================
+// MESSAGE BUBBLE
+// ============================================
+function MessageBubble({ message, onScheduleClick }) {
+  const isUser = message.role === 'user';
+
+  // Parse content for schedule link
+  const renderContent = () => {
+    if (message.hasScheduleLink) {
+      const parts = message.content.split('schedule time with your AI Advisor');
+      return (
+        <>
+          {parts[0]}
+          <button style={styles.inlineLink} onClick={onScheduleClick}>
+            schedule time with your AI Advisor
+          </button>
+          {parts[1]}
+        </>
+      );
+    }
+    return message.content;
+  };
 
   return (
-    <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>What matters most?</h1>
-      <p style={styles.stepSubtitle}>Pick up to 3 goals. We will focus on these together.</p>
-
-      <div style={styles.goalGrid}>
-        {goals.map(goal => {
-          const isSelected = formData.goals.includes(goal.id);
-          return (
-            <button
-              key={goal.id}
-              onClick={() => toggleGoal(goal.id)}
-              style={{
-                ...styles.goalBtn,
-                ...(isSelected ? styles.goalBtnActive : {})
-              }}
-            >
-              <span style={styles.goalIcon}>{goal.icon}</span>
-              <span style={styles.goalLabel}>{goal.label}</span>
-              {isSelected && (
-                <span style={styles.goalCheck}>✓</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      
-      <p style={{ 
-        fontSize: 13, 
-        color: colors.textMuted, 
-        textAlign: 'center',
-        marginTop: 16 
+    <div style={{
+      ...styles.messageWrapper,
+      justifyContent: isUser ? 'flex-end' : 'flex-start',
+    }}>
+      {!isUser && (
+        <div style={styles.messageAvatar}>
+          <img src={KUMO_URL} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+        </div>
+      )}
+      <div style={{
+        ...styles.messageBubble,
+        ...(isUser ? styles.userBubble : styles.advisorBubble),
       }}>
-        {formData.goals.length}/3 selected
-      </p>
+        <p style={styles.messageText}>{renderContent()}</p>
+        <span style={styles.messageTime}>
+          {message.time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+        </span>
+      </div>
     </div>
   );
 }
 
 // ============================================
-// STEP 5: FINAL
+// TYPING INDICATOR
 // ============================================
-function Step5Final({ formData, updateForm }) {
+function TypingIndicator() {
   return (
-    <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>Almost there</h1>
-      <p style={styles.stepSubtitle}>Anything else you want your advisor to know?</p>
+    <div style={styles.typingIndicator}>
+      <span style={{ ...styles.typingDot, animationDelay: '0s' }} />
+      <span style={{ ...styles.typingDot, animationDelay: '0.2s' }} />
+      <span style={{ ...styles.typingDot, animationDelay: '0.4s' }} />
+    </div>
+  );
+}
 
-      <div style={styles.formGroup}>
-        <label style={styles.label}>If you could change one thing about your finances, what would it be?</label>
-        <textarea
-          placeholder="e.g., I wish I knew where all my money goes each month..."
-          value={formData.changeWish}
-          onChange={(e) => updateForm('changeWish', e.target.value)}
-          rows={3}
-          style={styles.textareaLarge}
-        />
-      </div>
-
-      <div style={styles.formGroup}>
-        <label style={styles.label}>Anything else on your mind? (Optional)</label>
-        <textarea
-          placeholder="Feel free to share anything that might help us help you..."
-          value={formData.anythingElse}
-          onChange={(e) => updateForm('anythingElse', e.target.value)}
-          rows={4}
-          style={styles.textareaLarge}
-        />
-      </div>
-
-      <div style={styles.completionNote}>
-        <span style={{ fontSize: 24 }}>✨</span>
-        <div>
-          <div style={styles.completionTitle}>You're all set!</div>
-          <div style={styles.completionText}>
-            After this, you will meet your AI Advisor who will use everything you have shared to give you personalized guidance.
-          </div>
+// ============================================
+// SAVE MODAL
+// ============================================
+function SaveModal({ onSave, onDiscard, onCancel }) {
+  return (
+    <div style={styles.modalOverlay} onClick={onCancel}>
+      <div style={styles.modalContent} onClick={e => e.stopPropagation()}>
+        <div style={styles.successIcon}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={colors.success} strokeWidth="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+          </svg>
         </div>
+        <h3 style={styles.modalTitle}>Save this chat?</h3>
+        <p style={styles.modalText}>
+          We will send a summary to your Message Center so you can reference it later.
+        </p>
+        <button style={styles.modalPrimaryBtn} onClick={onSave}>
+          Save & Close
+        </button>
+        <button style={styles.modalSecondaryBtn} onClick={onDiscard}>
+          Discard
+        </button>
       </div>
     </div>
   );
+}
+
+// ============================================
+// FALLBACK RESPONSES
+// ============================================
+function getFallbackResponse(userMessage, userProfile) {
+  const lower = userMessage.toLowerCase();
+  
+  if (lower.includes('debt') || lower.includes('owe')) {
+    const stressNote = userProfile?.debtStress === 'Yes, significantly' 
+      ? ' — and you mentioned it has been causing real stress' 
+      : '';
+    return `I hear that debt is on your mind${stressNote}. Here is what helps: focus on one card at a time, usually the highest interest rate first. Even $25 extra per month makes a difference. What is the one debt that bothers you most?`;
+  }
+  
+  if (lower.includes('first') || lower.includes('focus') || lower.includes('start')) {
+    const advice = userProfile?.hasDebt && userProfile?.debtStress 
+      ? 'Given your debt is causing stress, I would start there — but build a tiny $500 buffer first so surprises do not create new debt.' 
+      : 'The foundation: small emergency buffer → high-interest debt → expand buffer → then investing.';
+    return `Good question. ${advice} What feels most urgent right now?`;
+  }
+  
+  if (lower.includes('purchase') || lower.includes('buy') || lower.includes('worth')) {
+    const goalNote = userProfile?.goals?.includes('breathing') 
+      ? 'You mentioned wanting breathing room — does this support that, or work against it?' 
+      : 'What is your gut telling you?';
+    return `When thinking through a purchase: "Will I still be glad I bought this in 2 weeks?" If yes, does it fit the budget without stress? ${goalNote}`;
+  }
+  
+  if (lower.includes('doing') || lower.includes('how am i')) {
+    const incomeNote = userProfile?.incomeStability === 'Uncertain' 
+      ? 'With uncertain income, even a small buffer matters more than optimizing.' 
+      : '';
+    return `Without your actual numbers connected, here is what matters: Are you ending each month with something left over, even $50? That is the foundation. ${incomeNote} How does a typical month look?`;
+  }
+  
+  return `I want to make sure I am helpful here. Could you tell me more about what is prompting this question? The more specific, the more relevant I can be to your actual situation.`;
 }
