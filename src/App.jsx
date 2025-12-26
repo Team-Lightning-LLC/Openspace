@@ -41,13 +41,15 @@ export default function App() {
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', work: '', workYears: 5,
-    incomeStability: '', income: '', savings: '',
+    incomeStability: '', financialKnowledge: 2, income: '', savings: '',
     hasDebt: null, debtTypes: [], debtStress: '',
     goals: [], retirementTimeline: 20,
     dependents: null, dependentCount: 1, soleEarner: null,
     upcomingEvents: '', decisionComfort: '',
     changeWish: '', anythingElse: '',
   });
+  const [readArticles, setReadArticles] = useState([]);
+  const [savedArticles, setSavedArticles] = useState([]);
   const [linkedAccounts, setLinkedAccounts] = useState([]);
   const [savedChats, setSavedChats] = useState([]);
 
@@ -108,7 +110,7 @@ export default function App() {
   }
 
   if (currentView === 'documents') {
-    return <DocumentCenter userProfile={formData} savedChats={savedChats} onBack={() => navigate('home', 'home')} />;
+    return <DocumentCenter userProfile={formData} savedChats={savedChats} savedArticles={savedArticles} onBack={() => navigate('home', 'home')} />;
   }
 
   // Main app with tabs
@@ -179,7 +181,13 @@ export default function App() {
           <PlanTab userProfile={formData} isOnboarded={isOnboarded} />
         )}
         {activeTab === 'learn' && (
-          <LearnTab />
+          <LearnTab 
+            userProfile={formData}
+            readArticles={readArticles}
+            savedArticles={savedArticles}
+            onReadArticle={(id) => setReadArticles(prev => prev.includes(id) ? prev : [...prev, id])}
+            onSaveArticle={(id) => setSavedArticles(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])}
+          />
         )}
         {activeTab === 'progress' && (
           <ProgressTab userProfile={formData} linkedAccounts={linkedAccounts} />
@@ -405,15 +413,239 @@ function PlanTab({ userProfile, isOnboarded }) {
 }
 
 // ============================================
-// LEARN TAB
+// LEARN TAB (with personalized articles)
 // ============================================
-function LearnTab() {
-  const articles = [
-    { id: 1, title: 'Emergency Funds 101', time: '5 min', icon: '🛡️', tag: 'Recommended' },
-    { id: 2, title: 'Understanding Credit Scores', time: '7 min', icon: '📊', tag: null },
-    { id: 3, title: 'Debt Payoff Strategies', time: '6 min', icon: '💳', tag: null },
-    { id: 4, title: 'Budgeting That Actually Works', time: '8 min', icon: '📝', tag: 'Popular' },
-  ];
+const ARTICLES = {
+  emergency: {
+    id: 'emergency',
+    title: 'Emergency Funds 101',
+    icon: '🛡️',
+    time: '4 min',
+    content: `An emergency fund is money you don't touch — until something goes wrong.
+
+Your car breaks. Your kid gets sick. You lose hours at work. These things happen. When they do, you need money that's just sitting there waiting.
+
+Start with $500. That's it. Not $10,000. Not three months of expenses. Just $500.
+
+Put $20 aside when you can. It adds up. When something breaks, you won't have to put it on a credit card. That's the whole point.
+
+**Why this matters**
+
+Without an emergency fund, every surprise becomes new debt. You pay off your card, the transmission dies, and you're right back where you started.
+
+The goal isn't to have a perfect amount saved. The goal is to have something — anything — between you and the next unexpected expense.
+
+**Your first step**
+
+Open a separate savings account (even at the same bank). Name it "Emergency Only." Set up an automatic transfer of whatever you can — $10, $20, $50. Forget it exists until you need it.
+
+That's the whole strategy. Simple. Boring. Life-changing.`
+  },
+  credit: {
+    id: 'credit',
+    title: 'Understanding Credit Scores',
+    icon: '📊',
+    time: '5 min',
+    content: `Your credit score is a number that tells lenders: "Can this person pay me back?"
+
+Higher is better. 700+ is good. 800+ is great.
+
+**What actually matters**
+
+The biggest thing that helps your score? Paying your bills on time. Every time. Even just the minimum.
+
+The biggest thing that hurts it? Missing payments or using too much of your credit card limit.
+
+That's really it. Pay on time. Don't max out your cards. Your score will climb.
+
+**The breakdown**
+
+• Payment history (35%): One missed payment hurts more than almost anything else
+• How much you owe vs. your limit (30%): Using $900 of a $1,000 limit looks risky. Try to stay under 30%
+• Age of accounts (15%): Keep old cards open, even if you don't use them
+• New credit (10%): Every application dings you a little. Space them out
+
+**Your first step**
+
+Set up autopay for at least the minimum payment on every card. You can always pay more, but you'll never miss a payment. That one habit protects your score more than anything else.`
+  },
+  debt: {
+    id: 'debt',
+    title: 'Debt Payoff Strategies',
+    icon: '💳',
+    time: '6 min',
+    content: `Debt feels like a hole you can't climb out of. But there's a ladder.
+
+**Step one: Stop the bleeding**
+
+Pay the minimum on everything. Every card, every loan. On time. This keeps you from falling deeper.
+
+**Step two: Pick your target**
+
+Any extra money goes to one debt. Just one. Pick the smallest balance first. When it's gone, take what you were paying and add it to the next one.
+
+That's called the snowball method. It works because you see progress. Progress keeps you going.
+
+**Why smallest first?**
+
+Math says pay the highest interest rate first. Psychology says pay the smallest balance first.
+
+Here's the truth: the best strategy is the one you'll actually finish. Most people need wins to stay motivated. Closing accounts feels good. That feeling matters.
+
+**What about balance transfers?**
+
+0% intro APR cards can save hundreds. But watch the fee (usually 3-5%) and have a plan for when the rate expires. If you're not sure, skip it. Keep it simple.
+
+**Your first step**
+
+List every debt: who you owe, how much, and the minimum payment. That list is your map. You can't climb out of a hole you can't see.`
+  },
+  budgeting: {
+    id: 'budgeting',
+    title: 'Budgeting That Actually Works',
+    icon: '📝',
+    time: '5 min',
+    content: `A budget isn't about saying no to everything. It's about knowing where your money goes.
+
+**The simplest approach**
+
+When you get paid, set aside money for three things first:
+• Rent/housing
+• Food
+• Bills that are due
+
+What's left is what you can spend on everything else.
+
+That's it. No spreadsheets. No apps. Just: needs first, then the rest.
+
+**If you want more structure**
+
+Try the 50/30/20 frame:
+• 50% needs (housing, food, transport, minimums)
+• 30% wants (everything that isn't survival)
+• 20% future (savings, extra debt payments)
+
+If your needs are 70%, you're not failing at budgeting — you're underpaid or overhoused. The budget just reveals it.
+
+**Why most budgets fail**
+
+They require daily decisions. Willpower runs out.
+
+The budgets that work are automatic: paycheck hits, money moves to savings, bills pay themselves, and what's left is yours to spend freely.
+
+**Your first step**
+
+For one week, just watch. Don't change anything. Write down what you spend. No judgment — just observation. You can't fix what you can't see.`
+  }
+};
+
+function LearnTab({ userProfile, readArticles, savedArticles, onReadArticle, onSaveArticle }) {
+  const [viewingArticle, setViewingArticle] = useState(null);
+  
+  // Determine personalized recommendations based on profile
+  const getRecommendations = () => {
+    const recommendations = [];
+    
+    // Based on goals
+    if (userProfile.goals?.includes('emergency') || userProfile.goals?.includes('breathing')) {
+      recommendations.push({ ...ARTICLES.emergency, reason: 'Based on your goals' });
+    }
+    if (userProfile.goals?.includes('debt')) {
+      recommendations.push({ ...ARTICLES.debt, reason: 'Based on your goals' });
+    }
+    
+    // Based on debt stress
+    if (userProfile.debtStress === 'Yes, significantly' || userProfile.debtStress === 'Moderately') {
+      if (!recommendations.find(r => r.id === 'debt')) {
+        recommendations.push({ ...ARTICLES.debt, reason: 'Might help with debt stress' });
+      }
+    }
+    
+    // Based on savings level
+    if (userProfile.savings === 'Under $1K' || userProfile.savings === '$1K - $5K') {
+      if (!recommendations.find(r => r.id === 'emergency')) {
+        recommendations.push({ ...ARTICLES.emergency, reason: 'Build your safety net' });
+      }
+    }
+    
+    // Fill with defaults if needed
+    if (recommendations.length < 2) {
+      if (!recommendations.find(r => r.id === 'budgeting')) {
+        recommendations.push({ ...ARTICLES.budgeting, reason: 'Popular with members' });
+      }
+    }
+    if (recommendations.length < 2) {
+      if (!recommendations.find(r => r.id === 'credit')) {
+        recommendations.push({ ...ARTICLES.credit, reason: 'Good to know' });
+      }
+    }
+    
+    return recommendations.slice(0, 3);
+  };
+
+  const allArticles = Object.values(ARTICLES);
+  const recommendations = getRecommendations();
+
+  // Article Reader View
+  if (viewingArticle) {
+    const isRead = readArticles.includes(viewingArticle.id);
+    const isSaved = savedArticles.includes(viewingArticle.id);
+    
+    return (
+      <div style={styles.container}>
+        <div style={styles.backgroundGradient} />
+        
+        <header style={styles.articleHeader}>
+          <button style={styles.backBtn} onClick={() => setViewingArticle(null)}>
+            <ChevronLeftIcon color={colors.text} />
+          </button>
+          <span style={styles.articleHeaderTime}>{viewingArticle.time} read</span>
+          <button 
+            style={{ ...styles.saveArticleBtn, ...(isSaved ? styles.saveArticleBtnActive : {}) }}
+            onClick={() => onSaveArticle(viewingArticle.id)}
+          >
+            <BookmarkIcon color={isSaved ? colors.white : colors.textMuted} />
+          </button>
+        </header>
+
+        <main style={styles.articleContent}>
+          <div style={styles.articleIconLarge}>{viewingArticle.icon}</div>
+          <h1 style={styles.articleTitle}>{viewingArticle.title}</h1>
+          
+          <div style={styles.articleBody}>
+            {viewingArticle.content.split('\n\n').map((paragraph, i) => {
+              if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+                return <h3 key={i} style={styles.articleHeading}>{paragraph.replace(/\*\*/g, '')}</h3>;
+              }
+              if (paragraph.startsWith('•')) {
+                return (
+                  <div key={i} style={styles.articleList}>
+                    {paragraph.split('\n').map((item, j) => (
+                      <p key={j} style={styles.articleListItem}>{item}</p>
+                    ))}
+                  </div>
+                );
+              }
+              return <p key={i} style={styles.articleParagraph}>{paragraph}</p>;
+            })}
+          </div>
+
+          <div style={styles.articleActions}>
+            <button 
+              style={{ ...styles.markReadBtn, ...(isRead ? styles.markReadBtnDone : {}) }}
+              onClick={() => { onReadArticle(viewingArticle.id); setViewingArticle(null); }}
+            >
+              {isRead ? (
+                <><CheckIcon color={colors.success} size={18} /> Marked as Read</>
+              ) : (
+                <><CheckIcon color={colors.white} size={18} /> Mark as Read</>
+              )}
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -422,30 +654,83 @@ function LearnTab() {
         <p style={{ fontSize: 15, color: colors.textSecondary, marginTop: 4 }}>Build your financial knowledge.</p>
       </div>
 
+      {/* For You This Week */}
       <div style={styles.card}>
-        <div style={{ ...styles.cardLabel, fontWeight: 600, color: colors.text, marginBottom: 16 }}>Recommended for You</div>
-        {articles.map((article, i) => (
-          <button key={article.id} style={{
-            display: 'flex', alignItems: 'center', gap: 14,
-            width: '100%', padding: '14px 0', background: 'none', border: 'none',
-            borderBottom: i < articles.length - 1 ? `1px solid ${colors.bgLight}` : 'none',
-            cursor: 'pointer', textAlign: 'left',
-          }}>
-            <span style={{ fontSize: 28 }}>{article.icon}</span>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 15, fontWeight: 500, color: colors.text }}>{article.title}</div>
-              <div style={{ fontSize: 13, color: colors.textMuted }}>{article.time} read</div>
-            </div>
-            {article.tag && (
-              <span style={{
-                fontSize: 11, fontWeight: 600, color: colors.indigo,
-                background: '#eef2ff', padding: '4px 8px', borderRadius: 6,
-              }}>{article.tag}</span>
-            )}
-            <ChevronIcon color={colors.textMuted} />
-          </button>
-        ))}
+        <div style={{ ...styles.cardLabel, fontWeight: 600, color: colors.text, marginBottom: 4 }}>For You This Week</div>
+        <p style={{ fontSize: 13, color: colors.textMuted, marginBottom: 16 }}>Personalized based on your profile</p>
+        
+        {recommendations.map((article, i) => {
+          const isRead = readArticles.includes(article.id);
+          return (
+            <button 
+              key={article.id} 
+              style={{
+                ...styles.articleItem,
+                borderBottom: i < recommendations.length - 1 ? `1px solid ${colors.bgLight}` : 'none',
+                opacity: isRead ? 0.5 : 1,
+              }}
+              onClick={() => setViewingArticle(article)}
+            >
+              <span style={{ fontSize: 28 }}>{article.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ 
+                  fontSize: 15, fontWeight: 500, color: colors.text,
+                  textDecoration: isRead ? 'line-through' : 'none',
+                }}>{article.title}</div>
+                <div style={{ fontSize: 13, color: colors.textMuted }}>{article.reason} · {article.time}</div>
+              </div>
+              {isRead ? (
+                <CheckIcon color={colors.success} size={18} />
+              ) : (
+                <ChevronIcon color={colors.textMuted} />
+              )}
+            </button>
+          );
+        })}
       </div>
+
+      {/* All Topics */}
+      <div style={styles.card}>
+        <div style={{ ...styles.cardLabel, fontWeight: 600, color: colors.text, marginBottom: 16 }}>All Topics</div>
+        {allArticles.map((article, i) => {
+          const isRead = readArticles.includes(article.id);
+          const isSaved = savedArticles.includes(article.id);
+          return (
+            <button 
+              key={article.id} 
+              style={{
+                ...styles.articleItem,
+                borderBottom: i < allArticles.length - 1 ? `1px solid ${colors.bgLight}` : 'none',
+                opacity: isRead ? 0.6 : 1,
+              }}
+              onClick={() => setViewingArticle(article)}
+            >
+              <span style={{ fontSize: 28 }}>{article.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ 
+                  fontSize: 15, fontWeight: 500, color: colors.text,
+                  textDecoration: isRead ? 'line-through' : 'none',
+                }}>{article.title}</div>
+                <div style={{ fontSize: 13, color: colors.textMuted }}>{article.time} read</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {isSaved && <BookmarkIcon color={colors.indigo} size={16} />}
+                {isRead ? (
+                  <CheckIcon color={colors.success} size={18} />
+                ) : (
+                  <ChevronIcon color={colors.textMuted} />
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {savedArticles.length > 0 && (
+        <p style={{ fontSize: 13, color: colors.textMuted, textAlign: 'center', marginTop: 8 }}>
+          {savedArticles.length} article{savedArticles.length > 1 ? 's' : ''} saved to Documents
+        </p>
+      )}
     </>
   );
 }
@@ -566,6 +851,8 @@ function OnboardingFlow({ step, setStep, formData, updateForm, toggleGoal, toggl
 
 // Step 1: Let's start simple
 function StepBasics({ formData, updateForm }) {
+  const knowledgeLabels = ['Unsure', 'Underwater', 'Paycheck to Paycheck', 'Savvy Saver', 'Investor'];
+  
   return (
     <div style={styles.stepContent}>
       <h1 style={styles.stepTitle}>Let's start simple</h1>
@@ -600,6 +887,17 @@ function StepBasics({ formData, updateForm }) {
               {option}
             </button>
           ))}
+        </div>
+      </FormGroup>
+
+      <FormGroup label="How would you describe your financial knowledge?">
+        <div style={styles.sliderContainer}>
+          <input type="range" min="0" max="4" value={formData.financialKnowledge} onChange={e => updateForm('financialKnowledge', parseInt(e.target.value))} style={styles.slider} />
+          <span style={styles.sliderValue}>{knowledgeLabels[formData.financialKnowledge]}</span>
+        </div>
+        <div style={styles.sliderLabels}>
+          <span>Unsure</span>
+          <span>Investor</span>
         </div>
       </FormGroup>
     </div>
@@ -1165,7 +1463,7 @@ function formatTimeAgo(date) {
 // ============================================
 // DOCUMENT CENTER
 // ============================================
-function DocumentCenter({ userProfile, savedChats, onBack }) {
+function DocumentCenter({ userProfile, savedChats, savedArticles, onBack }) {
   const [activeTab, setActiveTab] = useState('system'); // 'official' or 'system'
   const [viewingDoc, setViewingDoc] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -1202,7 +1500,22 @@ function DocumentCenter({ userProfile, savedChats, onBack }) {
     content: `**Saved Conversation**\n\n${chat.summary || 'Chat conversation saved for reference.'}\n\n---\n*${chat.messages?.length || 0} messages in this conversation*`
   }));
 
-  const allSystemDocs = [...systemDocs, ...chatDocs].sort((a, b) => new Date(b.date) - new Date(a.date));
+  // Add saved articles as documents
+  const articleDocs = (savedArticles || []).map(articleId => {
+    const article = ARTICLES[articleId];
+    if (!article) return null;
+    return {
+      id: `article-${articleId}`,
+      type: 'article',
+      title: article.title,
+      subtitle: 'Saved article',
+      date: new Date().toISOString().split('T')[0],
+      icon: article.icon,
+      content: article.content
+    };
+  }).filter(Boolean);
+
+  const allSystemDocs = [...systemDocs, ...articleDocs, ...chatDocs].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -1471,6 +1784,9 @@ function RefreshIcon({ color = colors.textMuted, spinning = false }) {
 function LockIcon({ color = colors.textMuted, size = 14 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
 }
+function BookmarkIcon({ color = colors.textMuted, size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>;
+}
 
 // ============================================
 // HELPERS
@@ -1681,4 +1997,27 @@ const styles = {
   docPlaceholder: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center' },
   docNotice: { display: 'flex', alignItems: 'center', gap: 8, marginTop: 16, padding: '12px 16px', background: colors.bgLight, borderRadius: 12, fontSize: 13, color: colors.textMuted },
   docMeta: { marginTop: 16, fontSize: 13, color: colors.textMuted, textAlign: 'center' },
+
+  // Slider Labels
+  sliderLabels: { display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 12, color: colors.textMuted },
+
+  // Article List
+  articleItem: { display: 'flex', alignItems: 'center', gap: 14, width: '100%', padding: '14px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' },
+
+  // Article Reader
+  articleHeader: { display: 'flex', alignItems: 'center', padding: '16px 20px', position: 'relative', zIndex: 1, gap: 12 },
+  articleHeaderTime: { flex: 1, fontSize: 14, color: colors.textMuted, textAlign: 'center' },
+  saveArticleBtn: { width: 44, height: 44, borderRadius: 12, background: colors.white, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+  saveArticleBtnActive: { background: colors.indigo },
+  articleContent: { padding: '0 20px 120px', position: 'relative', zIndex: 1 },
+  articleIconLarge: { fontSize: 48, marginBottom: 16 },
+  articleTitle: { fontSize: 28, fontWeight: 700, color: colors.text, marginBottom: 24, letterSpacing: -0.5, lineHeight: 1.2 },
+  articleBody: { background: colors.white, borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' },
+  articleHeading: { fontSize: 17, fontWeight: 600, color: colors.text, marginTop: 24, marginBottom: 12 },
+  articleParagraph: { fontSize: 16, color: colors.textSecondary, lineHeight: 1.7, marginBottom: 16 },
+  articleList: { marginBottom: 16 },
+  articleListItem: { fontSize: 16, color: colors.textSecondary, lineHeight: 1.7, marginBottom: 8, paddingLeft: 4 },
+  articleActions: { position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 430, padding: 20, background: `linear-gradient(180deg, transparent 0%, ${colors.bgPage} 30%)`, zIndex: 10 },
+  markReadBtn: { width: '100%', padding: '16px 20px', background: gradients.primary, border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, color: colors.white, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 4px 16px rgba(99,102,241,0.25)' },
+  markReadBtnDone: { background: colors.white, color: colors.success, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
 };
