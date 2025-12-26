@@ -40,17 +40,28 @@ export default function App() {
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', work: '',
+    name: '', email: '', phone: '', work: '', workYears: 5,
     incomeStability: '', income: '', savings: '',
     hasDebt: null, debtTypes: [], debtStress: '',
-    goals: [], dependents: false, dependentCount: '',
-    lifeEvents: [], decisionComfort: '', changeWish: '', anythingElse: '',
+    goals: [], retirementTimeline: 20,
+    dependents: null, dependentCount: 1, soleEarner: null,
+    upcomingEvents: '', decisionComfort: '',
+    changeWish: '', anythingElse: '',
   });
   const [linkedAccounts, setLinkedAccounts] = useState([]);
   const [savedChats, setSavedChats] = useState([]);
 
   const updateForm = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
   
+  const toggleArrayItem = (field, item) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(item)
+        ? prev[field].filter(i => i !== item)
+        : [...prev[field], item]
+    }));
+  };
+
   const toggleGoal = (goal) => {
     setFormData(prev => ({
       ...prev,
@@ -74,6 +85,7 @@ export default function App() {
         formData={formData}
         updateForm={updateForm}
         toggleGoal={toggleGoal}
+        toggleArrayItem={toggleArrayItem}
         onComplete={() => { setIsOnboarded(true); navigate('home', 'home'); }}
         onExit={() => navigate('home')}
       />
@@ -95,6 +107,10 @@ export default function App() {
     return <MessagesView savedChats={savedChats} onBack={() => navigate('home', 'home')} />;
   }
 
+  if (currentView === 'documents') {
+    return <DocumentCenter userProfile={formData} savedChats={savedChats} onBack={() => navigate('home', 'home')} />;
+  }
+
   // Main app with tabs
   return (
     <div style={styles.container}>
@@ -110,9 +126,12 @@ export default function App() {
           <span style={styles.logoText}>OpenSpace</span>
         </div>
         <div style={styles.headerRight}>
-          <button style={styles.notificationBtn}>
+          <button style={styles.notificationBtn} onClick={() => navigate('documents')}>
+            <FolderIcon />
+          </button>
+          <button style={styles.notificationBtn} onClick={() => navigate('messages')}>
             <BellIcon />
-            <span style={styles.notificationDot} />
+            {savedChats.length > 0 && <span style={styles.notificationDot} />}
           </button>
           <div style={styles.avatar}>
             {formData.name ? formData.name.charAt(0).toUpperCase() : 'O'}
@@ -492,24 +511,19 @@ function ProgressTab({ userProfile, linkedAccounts }) {
 }
 
 // ============================================
-// ONBOARDING FLOW
+// ONBOARDING FLOW (Complete 5-step flow)
 // ============================================
-function OnboardingFlow({ step, setStep, formData, updateForm, toggleGoal, onComplete, onExit }) {
+function OnboardingFlow({ step, setStep, formData, updateForm, toggleGoal, toggleArrayItem, onComplete, onExit }) {
   const TOTAL_STEPS = 5;
-
-  const canContinue = () => {
-    switch (step) {
-      case 0: return formData.name && formData.email;
-      case 1: return formData.income && formData.savings;
-      case 2: return formData.hasDebt !== null && (formData.hasDebt === false || formData.debtStress);
-      case 3: return formData.goals.length >= 1;
-      default: return true;
-    }
-  };
 
   const handleContinue = () => {
     if (step < TOTAL_STEPS - 1) setStep(step + 1);
     else onComplete();
+  };
+
+  const handleBack = () => {
+    if (step === 0) onExit();
+    else setStep(step - 1);
   };
 
   return (
@@ -518,7 +532,7 @@ function OnboardingFlow({ step, setStep, formData, updateForm, toggleGoal, onCom
       
       {/* Header */}
       <header style={styles.onboardingHeader}>
-        <button style={styles.backBtn} onClick={() => step > 0 ? setStep(step - 1) : onExit()}>
+        <button style={styles.backBtn} onClick={handleBack}>
           <ChevronLeftIcon color={colors.text} />
         </button>
         <div style={styles.progressContainer}>
@@ -532,21 +546,17 @@ function OnboardingFlow({ step, setStep, formData, updateForm, toggleGoal, onCom
 
       {/* Content */}
       <main style={styles.onboardingMain}>
-        {step === 0 && <Step1 formData={formData} updateForm={updateForm} />}
-        {step === 1 && <Step2 formData={formData} updateForm={updateForm} />}
-        {step === 2 && <Step3 formData={formData} updateForm={updateForm} />}
-        {step === 3 && <Step4 formData={formData} toggleGoal={toggleGoal} />}
-        {step === 4 && <Step5 formData={formData} updateForm={updateForm} />}
+        {step === 0 && <StepBasics formData={formData} updateForm={updateForm} />}
+        {step === 1 && <StepMoney formData={formData} updateForm={updateForm} toggleArrayItem={toggleArrayItem} />}
+        {step === 2 && <StepGoals formData={formData} toggleGoal={toggleGoal} updateForm={updateForm} />}
+        {step === 3 && <StepContext formData={formData} updateForm={updateForm} />}
+        {step === 4 && <StepHuman formData={formData} updateForm={updateForm} />}
       </main>
 
       {/* Footer */}
       <div style={styles.onboardingFooter}>
-        <button
-          style={{ ...styles.primaryBtn, opacity: canContinue() ? 1 : 0.5 }}
-          onClick={handleContinue}
-          disabled={!canContinue()}
-        >
-          {step === TOTAL_STEPS - 1 ? 'Complete Setup' : 'Continue'}
+        <button style={styles.primaryBtn} onClick={handleContinue}>
+          {step === TOTAL_STEPS - 1 ? 'Complete' : 'Continue'}
           <ChevronIcon color={colors.white} />
         </button>
       </div>
@@ -554,97 +564,142 @@ function OnboardingFlow({ step, setStep, formData, updateForm, toggleGoal, onCom
   );
 }
 
-function Step1({ formData, updateForm }) {
+// Step 1: Let's start simple
+function StepBasics({ formData, updateForm }) {
   return (
     <div style={styles.stepContent}>
       <h1 style={styles.stepTitle}>Let's start simple</h1>
       <p style={styles.stepSubtitle}>Just the basics so we know who we're talking to.</p>
+      
       <FormGroup label="What should we call you?">
-        <input style={styles.input} placeholder="Your first name" value={formData.name} onChange={e => updateForm('name', e.target.value)} />
+        <input style={styles.input} type="text" placeholder="Your first name" value={formData.name} onChange={e => updateForm('name', e.target.value)} />
       </FormGroup>
+
       <FormGroup label="How can we reach you?">
         <input style={{ ...styles.input, marginBottom: 12 }} type="email" placeholder="Email address" value={formData.email} onChange={e => updateForm('email', e.target.value)} />
-        <input style={styles.input} type="tel" placeholder="Phone number (optional)" value={formData.phone} onChange={e => updateForm('phone', e.target.value)} />
+        <input style={styles.input} type="tel" placeholder="Phone number" value={formData.phone} onChange={e => updateForm('phone', e.target.value)} />
       </FormGroup>
+
       <FormGroup label="What do you do for work?">
-        <input style={styles.input} placeholder="e.g., Teacher, Nurse, Freelancer..." value={formData.work} onChange={e => updateForm('work', e.target.value)} />
+        <input style={styles.input} type="text" placeholder="e.g., Teacher, Nurse, Freelancer, Between jobs..." value={formData.work} onChange={e => updateForm('work', e.target.value)} />
+      </FormGroup>
+
+      <FormGroup label="How long have you been doing that?">
+        <div style={styles.sliderContainer}>
+          <input type="range" min="0" max="30" value={formData.workYears} onChange={e => updateForm('workYears', parseInt(e.target.value))} style={styles.slider} />
+          <span style={styles.sliderValue}>
+            {formData.workYears === 0 ? '<1 year' : formData.workYears === 30 ? '30+ years' : `${formData.workYears} years`}
+          </span>
+        </div>
+      </FormGroup>
+
+      <FormGroup label="Does your income feel stable right now?">
+        <div style={styles.optionGrid}>
+          {['Very stable', 'Mostly stable', 'Uncertain', 'Actively unstable'].map(option => (
+            <button key={option} onClick={() => updateForm('incomeStability', option)} style={{ ...styles.optionBtn, ...(formData.incomeStability === option ? styles.optionBtnActive : {}) }}>
+              {option}
+            </button>
+          ))}
+        </div>
       </FormGroup>
     </div>
   );
 }
 
-function Step2({ formData, updateForm }) {
-  const incomeOptions = ['Under $30K', '$30K - $50K', '$50K - $75K', '$75K - $100K', '$100K - $150K', '$150K+'];
-  const savingsOptions = ['Under $1K', '$1K - $5K', '$5K - $15K', '$15K - $50K', '$50K - $100K', '$100K+'];
+// Step 2: Your money right now
+function StepMoney({ formData, updateForm, toggleArrayItem }) {
+  const debtTypes = ['Credit cards', 'Student loans', 'Car loan', 'Mortgage', 'Medical debt', 'Personal loans', 'Other'];
+  const stressOptions = ['Not at all', 'A little', 'Moderately', 'Yes, significantly'];
 
   return (
     <div style={styles.stepContent}>
       <h1 style={styles.stepTitle}>Your money right now</h1>
       <p style={styles.stepSubtitle}>A rough picture is all we need. No judgment here.</p>
+
       <FormGroup label="Roughly, what do you earn per year after taxes?">
         <div style={styles.optionGrid}>
-          {incomeOptions.map(opt => (
-            <button key={opt} onClick={() => updateForm('income', opt)} style={{ ...styles.optionBtn, ...(formData.income === opt ? styles.optionBtnActive : {}) }}>{opt}</button>
+          {['Under $30K', '$30K - $50K', '$50K - $75K', '$75K - $100K', '$100K - $150K', '$150K+'].map(option => (
+            <button key={option} onClick={() => updateForm('income', option)} style={{ ...styles.optionBtn, ...(formData.income === option ? styles.optionBtnActive : {}) }}>
+              {option}
+            </button>
           ))}
         </div>
       </FormGroup>
+
       <FormGroup label="How much do you have saved — all accounts combined?">
         <div style={styles.optionGrid}>
-          {savingsOptions.map(opt => (
-            <button key={opt} onClick={() => updateForm('savings', opt)} style={{ ...styles.optionBtn, ...(formData.savings === opt ? styles.optionBtnActive : {}) }}>{opt}</button>
+          {['Under $1K', '$1K - $5K', '$5K - $15K', '$15K - $50K', '$50K - $100K', '$100K+'].map(option => (
+            <button key={option} onClick={() => updateForm('savings', option)} style={{ ...styles.optionBtn, ...(formData.savings === option ? styles.optionBtnActive : {}) }}>
+              {option}
+            </button>
           ))}
         </div>
       </FormGroup>
-    </div>
-  );
-}
 
-function Step3({ formData, updateForm }) {
-  const stressOptions = ['Not at all', 'A little', 'Moderately', 'Yes, significantly'];
-
-  return (
-    <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>Let's talk about debt</h1>
-      <p style={styles.stepSubtitle}>Understanding your situation helps us give better guidance.</p>
       <FormGroup label="Do you have any debt right now?">
         <div style={{ ...styles.optionGrid, gridTemplateColumns: '1fr 1fr' }}>
           <button onClick={() => updateForm('hasDebt', true)} style={{ ...styles.optionBtn, ...(formData.hasDebt === true ? styles.optionBtnActive : {}) }}>Yes</button>
           <button onClick={() => updateForm('hasDebt', false)} style={{ ...styles.optionBtn, ...(formData.hasDebt === false ? styles.optionBtnActive : {}) }}>No</button>
         </div>
       </FormGroup>
+
       {formData.hasDebt && (
-        <FormGroup label="Does your debt cause you stress?">
-          <div style={styles.goalGrid}>
-            {stressOptions.map(opt => (
-              <button key={opt} onClick={() => updateForm('debtStress', opt)} style={{ ...styles.goalBtn, ...(formData.debtStress === opt ? styles.goalBtnActive : {}) }}>
-                <span style={styles.goalLabel}>{opt}</span>
-                {formData.debtStress === opt && <span style={styles.goalCheck}>✓</span>}
-              </button>
-            ))}
-          </div>
-        </FormGroup>
+        <>
+          <FormGroup label="What kinds? (Select all that apply)">
+            <div style={styles.optionGrid}>
+              {debtTypes.map(type => (
+                <button key={type} onClick={() => toggleArrayItem('debtTypes', type)} style={{ ...styles.optionBtn, ...(formData.debtTypes.includes(type) ? styles.optionBtnActive : {}) }}>
+                  {type}
+                </button>
+              ))}
+            </div>
+          </FormGroup>
+
+          <FormGroup label="Does your debt cause you stress?">
+            <div style={styles.goalGrid}>
+              {stressOptions.map(opt => (
+                <button key={opt} onClick={() => updateForm('debtStress', opt)} style={{ ...styles.goalBtn, ...(formData.debtStress === opt ? styles.goalBtnActive : {}) }}>
+                  <span style={styles.goalLabel}>{opt}</span>
+                  {formData.debtStress === opt && <span style={styles.goalCheck}>✓</span>}
+                </button>
+              ))}
+            </div>
+          </FormGroup>
+        </>
       )}
     </div>
   );
 }
 
-function Step4({ formData, toggleGoal }) {
+// Step 3: What are you working toward?
+function StepGoals({ formData, toggleGoal, updateForm }) {
   const goals = [
-    { id: 'emergency', icon: '🛡️', label: 'Build emergency savings' },
-    { id: 'debt', icon: '💳', label: 'Pay off debt' },
-    { id: 'invest', icon: '📈', label: 'Start investing' },
-    { id: 'retire', icon: '🏖️', label: 'Plan for retirement' },
-    { id: 'home', icon: '🏠', label: 'Save for a home' },
-    { id: 'breathing', icon: '😮‍💨', label: 'Just get breathing room' },
+    { id: 'debt', label: 'Getting out of debt', icon: '🔓' },
+    { id: 'emergency', label: 'Building an emergency cushion', icon: '🛡️' },
+    { id: 'saving', label: 'Saving for something specific', icon: '🎯' },
+    { id: 'kids', label: "My kids' future", icon: '👨‍👧‍👦' },
+    { id: 'retire', label: 'Retiring someday without panic', icon: '🏖️' },
+    { id: 'breathing', label: 'Just... breathing room', icon: '💨' },
+    { id: 'wealth', label: 'Growing wealth long term', icon: '📈' },
+    { id: 'other', label: 'Something else', icon: '✨' }
   ];
 
   return (
     <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>What matters most?</h1>
-      <p style={styles.stepSubtitle}>Pick up to 3 goals. We will focus on these together.</p>
+      <h1 style={styles.stepTitle}>What are you working toward?</h1>
+      <p style={styles.stepSubtitle}>Pick up to 3 things that matter most right now.</p>
+
       <div style={styles.goalGrid}>
         {goals.map(goal => (
-          <button key={goal.id} onClick={() => toggleGoal(goal.id)} style={{ ...styles.goalBtn, ...(formData.goals.includes(goal.id) ? styles.goalBtnActive : {}) }}>
+          <button
+            key={goal.id}
+            onClick={() => toggleGoal(goal.id)}
+            style={{
+              ...styles.goalBtn,
+              ...(formData.goals.includes(goal.id) ? styles.goalBtnActive : {}),
+              opacity: formData.goals.length >= 3 && !formData.goals.includes(goal.id) ? 0.5 : 1
+            }}
+          >
             <span style={{ fontSize: 24 }}>{goal.icon}</span>
             <span style={styles.goalLabel}>{goal.label}</span>
             {formData.goals.includes(goal.id) && <span style={styles.goalCheck}>✓</span>}
@@ -652,23 +707,97 @@ function Step4({ formData, toggleGoal }) {
         ))}
       </div>
       <p style={{ fontSize: 13, color: colors.textMuted, textAlign: 'center', marginTop: 16 }}>{formData.goals.length}/3 selected</p>
+
+      {formData.goals.includes('retire') && (
+        <FormGroup label="When would you like that to be possible?">
+          <div style={styles.sliderContainer}>
+            <input type="range" min="5" max="40" value={formData.retirementTimeline} onChange={e => updateForm('retirementTimeline', parseInt(e.target.value))} style={styles.slider} />
+            <span style={styles.sliderValue}>
+              {formData.retirementTimeline === 40 ? '40+ years' : `${formData.retirementTimeline} years`}
+            </span>
+          </div>
+        </FormGroup>
+      )}
     </div>
   );
 }
 
-function Step5({ formData, updateForm }) {
+// Step 4: A few things that help us help you
+function StepContext({ formData, updateForm }) {
+  const comfortOptions = [
+    { id: 'guide', label: 'I need a lot of guidance', desc: 'Walk me through everything' },
+    { id: 'collab', label: 'I like collaboration', desc: 'You advise, I decide' },
+    { id: 'handle', label: 'Just handle it for me', desc: "I trust you to do what's right" }
+  ];
+
   return (
     <div style={styles.stepContent}>
-      <h1 style={styles.stepTitle}>Almost there</h1>
-      <p style={styles.stepSubtitle}>Anything else you want your advisor to know?</p>
-      <FormGroup label="If you could change one thing about your finances, what would it be?">
-        <textarea style={styles.textarea} rows={3} placeholder="e.g., I wish I knew where all my money goes..." value={formData.changeWish} onChange={e => updateForm('changeWish', e.target.value)} />
+      <h1 style={styles.stepTitle}>A few things that help us help you</h1>
+      <p style={styles.stepSubtitle}>Your life shapes your finances. Let's understand it.</p>
+
+      <FormGroup label="Do you have anyone who depends on you financially?">
+        <div style={{ ...styles.optionGrid, gridTemplateColumns: '1fr 1fr' }}>
+          <button onClick={() => updateForm('dependents', true)} style={{ ...styles.optionBtn, ...(formData.dependents === true ? styles.optionBtnActive : {}) }}>Yes</button>
+          <button onClick={() => updateForm('dependents', false)} style={{ ...styles.optionBtn, ...(formData.dependents === false ? styles.optionBtnActive : {}) }}>No</button>
+        </div>
       </FormGroup>
+
+      {formData.dependents && (
+        <FormGroup label="How many?">
+          <div style={styles.counterRow}>
+            <button style={styles.counterBtn} onClick={() => updateForm('dependentCount', Math.max(1, formData.dependentCount - 1))}>−</button>
+            <span style={styles.counterValue}>{formData.dependentCount}</span>
+            <button style={styles.counterBtn} onClick={() => updateForm('dependentCount', Math.min(10, formData.dependentCount + 1))}>+</button>
+          </div>
+        </FormGroup>
+      )}
+
+      <FormGroup label="Are you the only earner in your household?">
+        <div style={{ ...styles.optionGrid, gridTemplateColumns: '1fr 1fr' }}>
+          <button onClick={() => updateForm('soleEarner', true)} style={{ ...styles.optionBtn, ...(formData.soleEarner === true ? styles.optionBtnActive : {}) }}>Yes</button>
+          <button onClick={() => updateForm('soleEarner', false)} style={{ ...styles.optionBtn, ...(formData.soleEarner === false ? styles.optionBtnActive : {}) }}>No, there's another</button>
+        </div>
+      </FormGroup>
+
+      <FormGroup label="Is there anything big coming up in the next few years?">
+        <p style={styles.labelHint}>Home purchase, wedding, medical procedure, job change, etc.</p>
+        <textarea style={styles.textarea} rows={3} placeholder="Optional — but it helps us plan with you" value={formData.upcomingEvents} onChange={e => updateForm('upcomingEvents', e.target.value)} />
+      </FormGroup>
+
+      <FormGroup label="How would you describe your comfort with financial decisions?">
+        <div style={styles.comfortOptions}>
+          {comfortOptions.map(option => (
+            <button key={option.id} onClick={() => updateForm('decisionComfort', option.id)} style={{ ...styles.comfortBtn, ...(formData.decisionComfort === option.id ? styles.comfortBtnActive : {}) }}>
+              <span style={styles.comfortLabel}>{option.label}</span>
+              <span style={styles.comfortDesc}>{option.desc}</span>
+            </button>
+          ))}
+        </div>
+      </FormGroup>
+    </div>
+  );
+}
+
+// Step 5: One more thing
+function StepHuman({ formData, updateForm }) {
+  return (
+    <div style={styles.stepContent}>
+      <h1 style={styles.stepTitle}>One more thing</h1>
+      <p style={styles.stepSubtitle}>This is the part where you tell us what really matters.</p>
+
+      <FormGroup label="If you could change one thing about your financial life, what would it be?">
+        <textarea style={styles.textareaLarge} rows={5} placeholder="Take your time. There's no wrong answer." value={formData.changeWish} onChange={e => updateForm('changeWish', e.target.value)} />
+      </FormGroup>
+
+      <FormGroup label="Is there anything you want us to know that we haven't asked about?">
+        <textarea style={styles.textareaLarge} rows={4} placeholder="Optional — but sometimes the most important things are the ones forms don't ask." value={formData.anythingElse} onChange={e => updateForm('anythingElse', e.target.value)} />
+      </FormGroup>
+
       <div style={styles.completionNote}>
-        <span style={{ fontSize: 24 }}>✨</span>
+        <CheckIcon color={colors.success} />
         <div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: '#065f46' }}>You're all set!</div>
-          <div style={{ fontSize: 14, color: '#047857' }}>After this, you will meet your AI Advisor.</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#065f46' }}>That's everything we need to get started.</div>
+          <div style={{ fontSize: 14, color: '#047857' }}>We'll use this to build your profile. You can always update it later.</div>
         </div>
       </div>
     </div>
@@ -1034,6 +1163,197 @@ function formatTimeAgo(date) {
 }
 
 // ============================================
+// DOCUMENT CENTER
+// ============================================
+function DocumentCenter({ userProfile, savedChats, onBack }) {
+  const [activeTab, setActiveTab] = useState('system'); // 'official' or 'system'
+  const [viewingDoc, setViewingDoc] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Official documents (synced from connected accounts)
+  const officialDocs = [
+    { id: 'bank-1', type: 'statement', title: 'Chase Checking Statement', subtitle: 'December 2024', date: '2024-12-15', icon: '🏦' },
+    { id: 'bank-2', type: 'statement', title: 'Chase Savings Statement', subtitle: 'December 2024', date: '2024-12-15', icon: '🏦' },
+    { id: 'util-1', type: 'utility', title: 'Electric Bill', subtitle: 'PECO Energy', date: '2024-12-10', icon: '⚡' },
+    { id: 'util-2', type: 'utility', title: 'Internet Bill', subtitle: 'Comcast Xfinity', date: '2024-12-08', icon: '📡' },
+    { id: 'cc-1', type: 'statement', title: 'Visa Credit Card', subtitle: 'November Statement', date: '2024-12-01', icon: '💳' },
+  ];
+
+  // System-generated documents
+  const systemDocs = [
+    { id: 'profile', type: 'profile', title: 'Your Financial Profile', subtitle: 'Generated from onboarding', date: new Date().toISOString().split('T')[0], icon: '👤', 
+      content: userProfile.name ? `**${userProfile.name}'s Financial Profile**\n\n**Work:** ${userProfile.work || 'Not specified'} (${userProfile.workYears || 0} years)\n**Income Stability:** ${userProfile.incomeStability || 'Not specified'}\n**Annual Income:** ${userProfile.income || 'Not specified'}\n**Savings:** ${userProfile.savings || 'Not specified'}\n**Has Debt:** ${userProfile.hasDebt === true ? 'Yes' : userProfile.hasDebt === false ? 'No' : 'Not specified'}\n${userProfile.debtStress ? `**Debt Stress Level:** ${userProfile.debtStress}` : ''}\n\n**Goals:** ${userProfile.goals?.length > 0 ? userProfile.goals.join(', ') : 'None selected'}\n\n**Dependents:** ${userProfile.dependents === true ? userProfile.dependentCount : userProfile.dependents === false ? 'None' : 'Not specified'}\n**Decision Style:** ${userProfile.decisionComfort || 'Not specified'}\n\n${userProfile.changeWish ? `**What they want to change:** "${userProfile.changeWish}"` : ''}` : 'Complete onboarding to generate your profile.' },
+    { id: 'plan-1', type: 'plan', title: 'Your Financial Plan', subtitle: 'Last updated Dec 20', date: '2024-12-20', icon: '📋',
+      content: '**Your Personalized Financial Plan**\n\n**Phase 1: Build Foundation (Months 1-3)**\n• Establish $1,000 emergency buffer\n• Track all spending for 30 days\n• Identify 3 areas to reduce expenses\n\n**Phase 2: Tackle Debt (Months 4-8)**\n• Focus on highest-interest debt first\n• Minimum payments on all others\n• Target: Pay off first card by Month 6\n\n**Phase 3: Grow Security (Months 9-12)**\n• Expand emergency fund to 3 months expenses\n• Begin automatic savings transfers\n• Review and adjust quarterly\n\n**Key Metrics to Track:**\n- Monthly savings rate: Target 15%\n- Debt-to-income ratio: Currently 28%, target 20%\n- Emergency fund: $0 → $5,000' },
+    { id: 'insights-1', type: 'insight', title: 'Learning Insights', subtitle: 'Your progress notes', date: '2024-12-18', icon: '💡',
+      content: '**Your Learning Journey**\n\n**Completed Lessons:**\n✓ Understanding Your Cash Flow\n✓ The Psychology of Spending\n✓ Emergency Funds 101\n\n**Key Takeaways:**\n• You tend to spend more on weekends - awareness is the first step\n• Your fixed expenses are 62% of income (healthy range: 50-60%)\n• Building a buffer reduces financial anxiety significantly\n\n**Recommended Next:**\n• "Debt Snowball vs Avalanche" - matches your goals\n• "Negotiating Bills" - quick wins available\n\n**Your Strengths:**\n• Consistent income timing\n• Low lifestyle inflation\n• Willingness to learn' },
+    { id: 'meeting-1', type: 'meeting', title: 'Advisor Meeting Notes', subtitle: 'Session from Dec 15', date: '2024-12-15', icon: '📝',
+      content: '**Advisor Session Notes — December 15, 2024**\n\n**Topics Discussed:**\n1. Review of November spending patterns\n2. Holiday budget planning\n3. Q1 goals setting\n\n**Key Decisions:**\n• Set holiday gift budget at $400 total\n• Pause extra debt payments in December\n• Resume aggressive paydown in January\n\n**Action Items:**\n□ Set up automatic transfer: $200/month to savings\n□ Call Comcast to negotiate rate\n□ Review subscriptions for cuts\n\n**Next Session:** January 15, 2025\n**Focus:** Q1 kickoff and tax prep planning' },
+  ];
+
+  // Add saved chats as documents
+  const chatDocs = savedChats.map((chat, i) => ({
+    id: `chat-${i}`,
+    type: 'chat',
+    title: 'Saved Chat',
+    subtitle: chat.timestamp ? new Date(chat.timestamp).toLocaleDateString() : 'Recent',
+    date: chat.timestamp ? new Date(chat.timestamp).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    icon: '💬',
+    content: `**Saved Conversation**\n\n${chat.summary || 'Chat conversation saved for reference.'}\n\n---\n*${chat.messages?.length || 0} messages in this conversation*`
+  }));
+
+  const allSystemDocs = [...systemDocs, ...chatDocs].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1500);
+  };
+
+  // Document Viewer
+  if (viewingDoc) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.backgroundGradient} />
+        
+        <header style={styles.docViewerHeader}>
+          <button style={styles.backBtn} onClick={() => setViewingDoc(null)}>
+            <ChevronLeftIcon color={colors.text} />
+          </button>
+          <div style={{ flex: 1 }}>
+            <h1 style={styles.docViewerTitle}>{viewingDoc.title}</h1>
+            <p style={styles.docViewerSubtitle}>{viewingDoc.subtitle}</p>
+          </div>
+          <button style={styles.refreshBtn} onClick={handleRefresh}>
+            <RefreshIcon color={refreshing ? colors.indigo : colors.textMuted} spinning={refreshing} />
+          </button>
+        </header>
+
+        <main style={styles.docViewerContent}>
+          <div style={styles.docCard}>
+            {viewingDoc.content ? (
+              <div style={styles.docText}>
+                {viewingDoc.content.split('\n').map((line, i) => {
+                  if (line.startsWith('**') && line.endsWith('**')) {
+                    return <h3 key={i} style={styles.docHeading}>{line.replace(/\*\*/g, '')}</h3>;
+                  }
+                  if (line.startsWith('•') || line.startsWith('✓') || line.startsWith('□')) {
+                    return <p key={i} style={styles.docListItem}>{line}</p>;
+                  }
+                  if (line.startsWith('---')) {
+                    return <hr key={i} style={styles.docDivider} />;
+                  }
+                  if (line.trim() === '') {
+                    return <div key={i} style={{ height: 12 }} />;
+                  }
+                  return <p key={i} style={styles.docParagraph}>{line}</p>;
+                })}
+              </div>
+            ) : (
+              <div style={styles.docPlaceholder}>
+                <span style={{ fontSize: 48 }}>{viewingDoc.icon}</span>
+                <p style={{ color: colors.textSecondary, marginTop: 16 }}>
+                  {activeTab === 'official' 
+                    ? 'Document preview not available. This document is synced from your connected account.'
+                    : 'Document content loading...'}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {activeTab === 'official' && (
+            <div style={styles.docNotice}>
+              <LockIcon color={colors.textMuted} />
+              <span>Official documents are read-only and cannot be edited.</span>
+            </div>
+          )}
+
+          <p style={styles.docMeta}>
+            Last synced: {new Date(viewingDoc.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </p>
+        </main>
+      </div>
+    );
+  }
+
+  // Document List
+  const docs = activeTab === 'official' ? officialDocs : allSystemDocs;
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.backgroundGradient} />
+
+      {/* Header */}
+      <header style={styles.messagesHeader}>
+        <button style={styles.backBtn} onClick={onBack}>
+          <ChevronLeftIcon color={colors.textSecondary} />
+        </button>
+        <span style={styles.messagesTitle}>Documents</span>
+        <button style={styles.refreshBtn} onClick={handleRefresh}>
+          <RefreshIcon color={refreshing ? colors.indigo : colors.textMuted} spinning={refreshing} />
+        </button>
+      </header>
+
+      {/* Toggle */}
+      <div style={styles.docToggleContainer}>
+        <div style={styles.docToggle}>
+          <button
+            style={{ ...styles.docToggleBtn, ...(activeTab === 'official' ? styles.docToggleBtnActive : {}) }}
+            onClick={() => setActiveTab('official')}
+          >
+            Official
+          </button>
+          <button
+            style={{ ...styles.docToggleBtn, ...(activeTab === 'system' ? styles.docToggleBtnActive : {}) }}
+            onClick={() => setActiveTab('system')}
+          >
+            System Generated
+          </button>
+        </div>
+      </div>
+
+      {/* Notice for official docs */}
+      {activeTab === 'official' && (
+        <div style={styles.docInfoBanner}>
+          <LockIcon color={colors.textMuted} size={16} />
+          <span>These documents are synced from your accounts and cannot be edited.</span>
+        </div>
+      )}
+
+      {/* Document List */}
+      <main style={styles.docListMain}>
+        {docs.length > 0 ? (
+          <div style={styles.docList}>
+            {docs.map((doc) => (
+              <button
+                key={doc.id}
+                style={styles.docItem}
+                onClick={() => setViewingDoc({ ...doc, tab: activeTab })}
+              >
+                <div style={styles.docItemIcon}>{doc.icon}</div>
+                <div style={styles.docItemContent}>
+                  <span style={styles.docItemTitle}>{doc.title}</span>
+                  <span style={styles.docItemSubtitle}>{doc.subtitle}</span>
+                </div>
+                <ChevronIcon color={colors.textMuted} />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div style={styles.emptyDocs}>
+            <span style={{ fontSize: 48, marginBottom: 16 }}>📁</span>
+            <p style={{ color: colors.textSecondary, fontSize: 15 }}>
+              {activeTab === 'official' 
+                ? 'No official documents yet. These will appear as your accounts sync.'
+                : 'No documents generated yet. Complete onboarding to get started.'}
+            </p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+// ============================================
 // HELPER COMPONENTS
 // ============================================
 function FormGroup({ label, children }) {
@@ -1142,6 +1462,15 @@ function SaveIcon({ color = colors.success, size = 20 }) {
 function CloseCircleIcon({ color = colors.textSecondary }) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>;
 }
+function FolderIcon({ color = colors.textSecondary }) {
+  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>;
+}
+function RefreshIcon({ color = colors.textMuted, spinning = false }) {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" style={{ animation: spinning ? 'spin 1s linear infinite' : 'none' }}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>;
+}
+function LockIcon({ color = colors.textMuted, size = 14 }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+}
 
 // ============================================
 // HELPERS
@@ -1246,6 +1575,29 @@ const styles = {
   goalLabel: { flex: 1, fontSize: 15, fontWeight: 500, color: colors.text },
   goalCheck: { width: 24, height: 24, borderRadius: 12, background: colors.indigo, color: colors.white, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700 },
   completionNote: { display: 'flex', gap: 16, padding: 20, background: colors.successLight, borderRadius: 16, marginTop: 20 },
+  
+  // Slider
+  sliderContainer: { display: 'flex', alignItems: 'center', gap: 16 },
+  slider: { flex: 1, height: 6, WebkitAppearance: 'none', appearance: 'none', background: colors.border, borderRadius: 3, outline: 'none', cursor: 'pointer' },
+  sliderValue: { fontSize: 15, fontWeight: 600, color: colors.indigo, minWidth: 80, textAlign: 'right' },
+  
+  // Counter
+  counterRow: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24 },
+  counterBtn: { width: 48, height: 48, borderRadius: 14, background: colors.white, border: `2px solid ${colors.border}`, fontSize: 24, fontWeight: 500, color: colors.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  counterValue: { fontSize: 32, fontWeight: 700, color: colors.text, minWidth: 48, textAlign: 'center' },
+  
+  // Comfort options
+  comfortOptions: { display: 'flex', flexDirection: 'column', gap: 10 },
+  comfortBtn: { display: 'flex', flexDirection: 'column', gap: 4, padding: '18px 20px', background: colors.white, border: `2px solid ${colors.border}`, borderRadius: 14, cursor: 'pointer', textAlign: 'left' },
+  comfortBtnActive: { background: '#eef2ff', borderColor: colors.indigo },
+  comfortLabel: { fontSize: 15, fontWeight: 600, color: colors.text },
+  comfortDesc: { fontSize: 13, color: colors.textSecondary },
+  
+  // Label hint
+  labelHint: { fontSize: 13, color: colors.textMuted, marginTop: -8, marginBottom: 12 },
+  
+  // Large textarea
+  textareaLarge: { width: '100%', padding: '16px 18px', background: colors.white, border: `2px solid ${colors.border}`, borderRadius: 14, fontSize: 16, color: colors.text, outline: 'none', resize: 'none', fontFamily: 'inherit', boxSizing: 'border-box', minHeight: 120 },
 
   // Chat
   chatHeader: { display: 'flex', alignItems: 'center', padding: '12px 16px', background: colors.white, borderBottom: `1px solid ${colors.bgLight}`, gap: 12 },
@@ -1298,4 +1650,35 @@ const styles = {
   preferencesTitle: { fontSize: 15, fontWeight: 600, color: colors.text, marginBottom: 8 },
   preferencesText: { fontSize: 14, color: colors.textSecondary, lineHeight: 1.5, marginBottom: 16 },
   preferencesBtn: { padding: '10px 16px', background: 'none', border: `1px solid ${colors.border}`, borderRadius: 10, fontSize: 14, fontWeight: 500, color: colors.text, cursor: 'pointer' },
+
+  // Document Center
+  refreshBtn: { width: 44, height: 44, borderRadius: 12, background: colors.white, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+  docToggleContainer: { padding: '0 20px 16px', position: 'relative', zIndex: 1 },
+  docToggle: { display: 'flex', background: colors.bgLight, borderRadius: 12, padding: 4 },
+  docToggleBtn: { flex: 1, padding: '10px 16px', background: 'transparent', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 500, color: colors.textSecondary, cursor: 'pointer', transition: 'all 0.2s' },
+  docToggleBtnActive: { background: colors.white, color: colors.text, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+  docInfoBanner: { display: 'flex', alignItems: 'center', gap: 8, margin: '0 20px 16px', padding: '12px 16px', background: colors.bgLight, borderRadius: 12, fontSize: 13, color: colors.textMuted },
+  docListMain: { padding: '0 20px 40px', position: 'relative', zIndex: 1 },
+  docList: { display: 'flex', flexDirection: 'column', gap: 10 },
+  docItem: { display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', background: colors.white, border: 'none', borderRadius: 16, cursor: 'pointer', textAlign: 'left', width: '100%', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+  docItemIcon: { width: 44, height: 44, borderRadius: 12, background: colors.bgLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 },
+  docItemContent: { flex: 1, minWidth: 0 },
+  docItemTitle: { display: 'block', fontSize: 15, fontWeight: 500, color: colors.text, marginBottom: 2 },
+  docItemSubtitle: { display: 'block', fontSize: 13, color: colors.textMuted },
+  emptyDocs: { textAlign: 'center', padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  
+  // Document Viewer
+  docViewerHeader: { display: 'flex', alignItems: 'center', padding: '16px 20px', position: 'relative', zIndex: 1, gap: 12 },
+  docViewerTitle: { fontSize: 18, fontWeight: 600, color: colors.text, margin: 0 },
+  docViewerSubtitle: { fontSize: 13, color: colors.textMuted, margin: 0 },
+  docViewerContent: { padding: '0 20px 40px', position: 'relative', zIndex: 1 },
+  docCard: { background: colors.white, borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', minHeight: 300 },
+  docText: { fontSize: 15, color: colors.text, lineHeight: 1.6 },
+  docHeading: { fontSize: 17, fontWeight: 600, color: colors.text, marginTop: 20, marginBottom: 12 },
+  docParagraph: { marginBottom: 8, color: colors.textSecondary },
+  docListItem: { marginBottom: 6, paddingLeft: 8, color: colors.textSecondary },
+  docDivider: { border: 'none', borderTop: `1px solid ${colors.border}`, margin: '20px 0' },
+  docPlaceholder: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center' },
+  docNotice: { display: 'flex', alignItems: 'center', gap: 8, marginTop: 16, padding: '12px 16px', background: colors.bgLight, borderRadius: 12, fontSize: 13, color: colors.textMuted },
+  docMeta: { marginTop: 16, fontSize: 13, color: colors.textMuted, textAlign: 'center' },
 };
