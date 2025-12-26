@@ -1,56 +1,49 @@
 import React, { useState } from 'react';
+import { styles, KUMO_URL } from './styles';
 import HomePage from './HomePage';
 import OnboardingFlow from './OnboardingFlow';
 import AdvisorChat from './AdvisorChat';
-import AccountLinking from './AccountLinking';
 import PlanView from './PlanView';
 import LearnView from './LearnView';
 import ProgressView from './ProgressView';
 import MessagesView from './MessagesView';
+import AccountLinking from './AccountLinking';
 
 export default function App() {
   // Navigation state
   const [currentView, setCurrentView] = useState('home');
   const [activeTab, setActiveTab] = useState('home');
+  
+  // Onboarding state
   const [onboardingStep, setOnboardingStep] = useState(0);
-  
-  // User state
   const [isOnboarded, setIsOnboarded] = useState(false);
-  const [linkedAccounts, setLinkedAccounts] = useState([]);
   
-  // Onboarding form data
+  // User profile data
   const [formData, setFormData] = useState({
-    // Step 1: Basics
     name: '',
     email: '',
     phone: '',
     work: '',
-    workYears: 5,
     incomeStability: '',
-    
-    // Step 2: Money snapshot
     income: '',
     savings: '',
     hasDebt: null,
     debtTypes: [],
-    debtAmount: '',
     debtStress: '',
-    
-    // Step 3: Goals
     goals: [],
-    retirementTimeline: 15,
-    
-    // Step 4: Life context
-    dependents: null,
-    dependentCount: 1,
-    soleEarner: null,
-    upcomingEvents: '',
+    dependents: false,
+    dependentCount: '',
+    lifeEvents: [],
     decisionComfort: '',
-    
-    // Step 5: Human layer
     changeWish: '',
-    anythingElse: ''
+    anythingElse: '',
   });
+  
+  // Account linking state
+  const [linkedAccounts, setLinkedAccounts] = useState([]);
+  
+  // Chat state
+  const [savedChats, setSavedChats] = useState([]);
 
   // Form helpers
   const updateForm = (field, value) => {
@@ -60,44 +53,45 @@ export default function App() {
   const toggleArrayItem = (field, item) => {
     setFormData(prev => ({
       ...prev,
-      [field]: prev[field].includes(item) 
+      [field]: prev[field].includes(item)
         ? prev[field].filter(i => i !== item)
         : [...prev[field], item]
     }));
   };
 
-  // Navigation handlers
+  const toggleGoal = (goal) => {
+    setFormData(prev => ({
+      ...prev,
+      goals: prev.goals.includes(goal)
+        ? prev.goals.filter(g => g !== goal)
+        : prev.goals.length < 3
+          ? [...prev.goals, goal]
+          : prev.goals
+    }));
+  };
+
+  // Navigation
   const navigate = (view, tab = null) => {
     setCurrentView(view);
     if (tab) setActiveTab(tab);
   };
 
-  const handleStartOnboarding = () => {
-    setCurrentView('onboarding');
-    setOnboardingStep(0);
-  };
-
-  const handleCompleteOnboarding = () => {
-    console.log('Onboarding complete. Generating profile from:', formData);
+  // Onboarding completion
+  const completeOnboarding = () => {
     setIsOnboarded(true);
     setCurrentView('home');
   };
 
-  const handleExitOnboarding = () => {
-    setCurrentView('home');
-  };
-
-  const handleStartAccountLinking = () => {
-    setCurrentView('accountLinking');
-  };
-
-  const handleCompleteAccountLinking = (accounts) => {
+  // Account linking completion
+  const completeAccountLinking = (accounts) => {
     setLinkedAccounts(accounts);
     setCurrentView('home');
   };
 
-  const handleExitAccountLinking = () => {
-    setCurrentView('home');
+  // Save chat
+  const handleSaveChat = (chatData) => {
+    setSavedChats(prev => [...prev, chatData]);
+    // In production, this would also send to Messages
   };
 
   // Render current view
@@ -105,23 +99,15 @@ export default function App() {
     switch (currentView) {
       case 'onboarding':
         return (
-          <OnboardingFlow 
+          <OnboardingFlow
             step={onboardingStep}
             setStep={setOnboardingStep}
             formData={formData}
             updateForm={updateForm}
+            toggleGoal={toggleGoal}
             toggleArrayItem={toggleArrayItem}
-            onComplete={handleCompleteOnboarding}
-            onExit={handleExitOnboarding}
-          />
-        );
-      
-      case 'accountLinking':
-        return (
-          <AccountLinking
-            onComplete={handleCompleteAccountLinking}
-            onExit={handleExitAccountLinking}
-            linkedAccounts={linkedAccounts}
+            onComplete={completeOnboarding}
+            onExit={() => navigate('home')}
           />
         );
       
@@ -131,21 +117,22 @@ export default function App() {
             userName={formData.name}
             userProfile={formData}
             onNavigate={navigate}
+            onOpenScheduler={() => {/* Open scheduler modal */}}
+            onSaveChat={handleSaveChat}
           />
         );
       
-      case 'messages':
+      case 'accountLinking':
         return (
-          <MessagesView
-            userName={formData.name}
-            onNavigate={navigate}
+          <AccountLinking
+            onComplete={completeAccountLinking}
+            onBack={() => navigate('home')}
           />
         );
       
       case 'plan':
         return (
           <PlanView
-            userName={formData.name}
             userProfile={formData}
             onNavigate={navigate}
             activeTab={activeTab}
@@ -156,7 +143,7 @@ export default function App() {
       case 'learn':
         return (
           <LearnView
-            userName={formData.name}
+            userProfile={formData}
             onNavigate={navigate}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -166,7 +153,6 @@ export default function App() {
       case 'progress':
         return (
           <ProgressView
-            userName={formData.name}
             userProfile={formData}
             linkedAccounts={linkedAccounts}
             onNavigate={navigate}
@@ -175,17 +161,28 @@ export default function App() {
           />
         );
       
+      case 'messages':
+        return (
+          <MessagesView
+            savedChats={savedChats}
+            onNavigate={navigate}
+          />
+        );
+      
       case 'home':
       default:
         return (
-          <HomePage 
-            onStartOnboarding={handleStartOnboarding}
-            onStartAccountLinking={handleStartAccountLinking}
-            onNavigate={navigate}
-            isOnboarded={isOnboarded}
-            hasLinkedAccounts={linkedAccounts.length > 0}
+          <HomePage
             userName={formData.name}
-            userProfile={formData}
+            isOnboarded={isOnboarded}
+            linkedAccounts={linkedAccounts}
+            onStartOnboarding={() => {
+              setOnboardingStep(0);
+              navigate('onboarding');
+            }}
+            onOpenChat={() => navigate('advisor')}
+            onLinkAccounts={() => navigate('accountLinking')}
+            onNavigate={navigate}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />
